@@ -819,8 +819,9 @@ const Services = ({ services }: { services: Service[] }) => {
   ];
 
   return (
-    <SectionWrapper id="services" className="bg-white dark:bg-[#0a0a0a] py-12 md:py-16 border-b border-black/5 dark:border-white/5">
-      <div className="text-center mb-12 md:mb-20">
+    <>
+      <SectionWrapper id="services" className="bg-white dark:bg-[#0a0a0a] py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+        <div className="text-center mb-12 md:mb-20">
         <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("services.title")}</h2>
         <p className="text-black/70 dark:text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal px-4">
           {t("services.subtitle")}
@@ -854,18 +855,7 @@ const Services = ({ services }: { services: Service[] }) => {
               {/* Radial Light Effect */}
               <div className="absolute -top-24 rtl:-right-2 ltr:-left-2 w-48 h-48 bg-amber-500/5 dark:bg-amber-500/10 blur-[80px] rounded-full group-hover:bg-amber-500/10 dark:group-hover:bg-amber-500/20 transition-colors duration-500 z-0"></div>
               
-              <div className="mb-2 sm:mb-4 md:mb-8 p-2 sm:p-4 md:p-6 rounded-[12px] sm:rounded-[22px] bg-gradient-to-br from-white dark:from-[#222] to-gray-50 dark:to-[#111] border-t border-l border-white/80 dark:border-white/10 border-b-2 border-r-2 border-black/5 dark:border-black/40 shadow-lg w-fit group-hover:scale-110 transition-transform duration-500 relative flex items-center justify-center z-10">
-                {/* Glow Effect Behind Icon */}
-                <div className="absolute inset-0 bg-amber-500/0 group-hover:bg-amber-500/30 blur-xl transition-all duration-500 rounded-full scale-50 group-hover:scale-150 z-0"></div>
-                
-                <motion.div whileHover={bounceAnimation} animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: i * 0.1 }} className={`relative z-10 w-6 h-6 sm:w-10 sm:h-10 md:w-14 md:h-14 flex items-center justify-center ${s.cardBgImage ? 'text-white' : 'text-[#111] dark:text-white'}`}>
-                  <Icon className="w-8 h-8 md:w-12 md:h-12" />
-                </motion.div>
-                {/* Inner Light Reflection */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 pointer-events-none rounded-[12px] sm:rounded-[22px]"></div>
-              </div>
-              
-              <div>
+              <div className="mt-auto">
                 <h3 className={`text-[10px] sm:text-base md:text-[22px] font-bold md:font-medium mb-1 sm:mb-2 md:mb-6 group-hover:text-amber-500 transition-colors duration-300 relative z-10 ${s.cardBgImage ? 'text-white' : 'text-[#111] dark:text-white'}`}>{t(`service.${s.id}.title`) || s.title}</h3>
                 <p className={`text-[8px] sm:text-xs md:text-[16px] leading-tight sm:leading-relaxed md:leading-[1.75] font-normal relative z-10 line-clamp-2 md:line-clamp-none ${s.cardBgImage ? 'text-white/90' : 'text-[#111]/80 dark:text-white/80'}`}>{t(`service.${s.id}.desc`) || s.desc}</p>
               </div>
@@ -876,10 +866,11 @@ const Services = ({ services }: { services: Service[] }) => {
           );
         })}
       </div>
-      <AnimatePresence>
-        {selectedServiceIndex !== null && currentService && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-2 sm:p-6 md:p-12" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            <motion.div
+    </SectionWrapper>
+    <AnimatePresence>
+      {selectedServiceIndex !== null && currentService && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-2 sm:p-6 md:p-12" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+          <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -1011,7 +1002,7 @@ const Services = ({ services }: { services: Service[] }) => {
           </div>
         )}
       </AnimatePresence>
-    </SectionWrapper>
+    </>
   );
 };
 
@@ -1138,8 +1129,9 @@ const Portfolio = ({ works }: { works: Work[] }) => {
 
 
   return (
-    <SectionWrapper id="portfolio" className="py-12 md:py-16 border-b border-black/5 dark:border-white/5">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
+    <>
+      <SectionWrapper id="portfolio" className="py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
         <div>
           <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent heading-gradient truncate w-full max-w-full block">{t('portfolio.title')}</h2>
           <p className="text-black/70 dark:text-white/80 max-w-[60ch] text-lg md:text-xl font-medium font-normal">
@@ -1199,11 +1191,12 @@ const Portfolio = ({ works }: { works: Work[] }) => {
           </div>
         </div>
       </div>
+    </SectionWrapper>
 
-      <AnimatePresence>
-        {selectedWork && (
-          <motion.div 
-            initial={{ opacity: 0 }}
+    <AnimatePresence>
+      {selectedWork && (
+        <motion.div 
+          initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedIndex(null)}
@@ -1319,7 +1312,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
           </motion.div>
         )}
       </AnimatePresence>
-    </SectionWrapper>
+    </>
   );
 };
 
