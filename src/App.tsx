@@ -433,7 +433,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
     <>
 
       {/* Desktop Navigation */}
-      <div className="hidden md:flex fixed top-10 left-0 right-0 z-[90] h-20 items-center px-8 bg-white/60 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border-b border-black/10 dark:border-white/10 shadow-sm transition-all justify-between">
+      <div className="hide-on-video hidden md:flex fixed top-10 left-0 right-0 z-[90] h-20 items-center px-8 bg-white/60 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border-b border-black/10 dark:border-white/10 shadow-sm transition-all justify-between">
         <div className="w-[100px] xl:w-[200px] flex justify-start items-center">
           <a href="#home" className="flex items-center">
             <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-10 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)] transition-transform hover:scale-105 duration-300"  loading="lazy" />
@@ -489,7 +489,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
         </div>
       </div>
       {/* Mobile Navigation Header */}
-      <div className="md:hidden fixed top-10 left-0 right-0 z-[100] h-16 flex items-center justify-between px-4 bg-white/60 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border-b border-black/10 dark:border-white/10 shadow-sm">
+      <div className="hide-on-video md:hidden fixed top-10 left-0 right-0 z-[100] h-16 flex items-center justify-between px-4 bg-white/60 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border-b border-black/10 dark:border-white/10 shadow-sm">
         <div className="flex-1 flex justify-start">
           <a href="#home" className="flex items-center">
             <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-8 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
@@ -735,7 +735,7 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
 const StatsSection = () => {
   const { t, language } = useLanguage();
   return (
-    <SectionWrapper id="stats" className="bg-gray-50 dark:bg-[#050505] py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="stats" className="bg-gray-50 dark:bg-[#050505] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10 md:mb-16">
           <motion.h2 
@@ -787,6 +787,14 @@ const Services = ({ services }: { services: Service[] }) => {
   const [selectedServiceIndex, setSelectedServiceIndex] = useState<number | null>(null);
 
   useEffect(() => {
+    if (selectedServiceIndex !== null) {
+      document.body.classList.add('video-playing');
+    } else {
+      document.body.classList.remove('video-playing');
+    }
+  }, [selectedServiceIndex]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setTick(prev => prev + 1);
     }, 5000);
@@ -820,7 +828,7 @@ const Services = ({ services }: { services: Service[] }) => {
 
   return (
     <>
-      <SectionWrapper id="services" className="bg-white dark:bg-[#0a0a0a] py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+      <SectionWrapper id="services" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
         <div className="text-center mb-12 md:mb-20">
         <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("services.title")}</h2>
         <p className="text-black/70 dark:text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal px-4">
@@ -1051,6 +1059,15 @@ const PortfolioMediaContent = ({ w, isIframeVideo, getVideoEmbedUrl, selectedWor
 const Portfolio = ({ works }: { works: Work[] }) => {
   const { t, language } = useLanguage();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (selectedIndex !== null) {
+      document.body.classList.add('video-playing');
+    } else {
+      document.body.classList.remove('video-playing');
+    }
+  }, [selectedIndex]);
+
   const [activeCategory, setActiveCategory] = useState<string>('portfolio.all');
   const videoContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -1130,7 +1147,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
 
   return (
     <>
-      <SectionWrapper id="portfolio" className="py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+      <SectionWrapper id="portfolio" className="py-8 md:py-16 border-b border-black/5 dark:border-white/5">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
         <div>
           <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent heading-gradient truncate w-full max-w-full block">{t('portfolio.title')}</h2>
@@ -1335,7 +1352,7 @@ const FAQ = () => {
 */
 
   return (
-    <SectionWrapper id="faq" className="bg-white dark:bg-[#0a0a0a] py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="faq" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -1397,7 +1414,7 @@ const Process = () => {
 */
 
   return (
-    <SectionWrapper id="process" className="bg-gray-50 dark:bg-[#050505] py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="process" className="bg-gray-50 dark:bg-[#050505] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
       <div className="text-center mb-16 md:mb-20">
         <ScrollReveal>
           <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("process.title")}</h2>
@@ -1444,7 +1461,7 @@ const Partners = ({ partners = [] }: { partners?: Partner[] }) => {
   if (!partners || partners.length === 0) return null;
 
   return (
-    <SectionWrapper id="partners" className="bg-white dark:bg-[#0a0a0a] py-12 md:py-16 overflow-hidden border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="partners" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 overflow-hidden border-b border-black/5 dark:border-white/5">
       <div className="max-w-7xl mx-auto px-6 mb-12">
         <ScrollReveal>
           <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center heading-gradient mb-4 truncate w-full max-w-full block text-black dark:text-white">{t("partners.title")}</h2>
@@ -1452,7 +1469,7 @@ const Partners = ({ partners = [] }: { partners?: Partner[] }) => {
         </ScrollReveal>
       </div>
       <div 
-        className="relative w-full overflow-hidden flex bg-transparent py-12" 
+        className="relative w-full overflow-hidden flex bg-transparent py-8" 
         dir="ltr"
         onMouseEnter={() => {
           setIsHovered(true);
@@ -1650,7 +1667,7 @@ const Testimonials = () => {
 */
 
   return (
-    <SectionWrapper id="testimonials" className="bg-gray-50 dark:bg-[#050505] py-12 md:py-16 overflow-hidden relative border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="testimonials" className="bg-gray-50 dark:bg-[#050505] py-8 md:py-16 overflow-hidden relative border-b border-black/5 dark:border-white/5">
       <div className="max-w-7xl mx-auto px-6 mb-16 text-center">
         <ScrollReveal>
           <AnimatedTitle text={t("testimonials.title")} className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center heading-gradient mb-4 truncate w-full max-w-full" />
@@ -1760,7 +1777,7 @@ const Contact = () => {
   };
 
   return (
-    <SectionWrapper id="contact" className="bg-white dark:bg-[#0a0a0a] py-12 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="contact" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <ScrollReveal>
@@ -2598,7 +2615,7 @@ const MapReviewsOverlay = () => {
 
 const MapSection = () => {
   return (
-    <SectionWrapper id="map" className="bg-white dark:bg-[#0a0a0a] py-12 md:py-20 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="map" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-20 border-b border-black/5 dark:border-white/5">
       <div className="max-w-7xl mx-auto px-6">
         <ScrollReveal>
           <div className="text-center mb-12">
@@ -2636,7 +2653,7 @@ const MapSection = () => {
 const AnnouncementBanner = () => {
   const { t, language } = useLanguage();
   return (
-    <div className="fixed top-0 left-0 right-0 h-10 bg-gradient-to-r from-amber-50 via-white to-amber-50 dark:from-amber-950/40 dark:via-black/60 dark:to-amber-950/40 backdrop-blur-md animate-gradient-x text-amber-900 dark:text-amber-100/80 flex items-center overflow-hidden z-[110] shadow-sm border-b border-amber-200/30 dark:border-white/5">
+    <div className="hide-on-video transition-all duration-300 fixed top-0 left-0 right-0 h-10 bg-gradient-to-r from-amber-50 via-white to-amber-50 dark:from-amber-950/40 dark:via-black/60 dark:to-amber-950/40 backdrop-blur-md animate-gradient-x text-amber-900 dark:text-amber-100/80 flex items-center overflow-hidden z-[110] shadow-sm border-b border-amber-200/30 dark:border-white/5">
       <div className="flex animate-marquee whitespace-nowrap min-w-full" dir="ltr">
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className={`flex items-center gap-6 px-4 text-[10px] md:text-xs ${language === 'ar' ? 'flex-row-reverse' : ''}`}>

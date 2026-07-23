@@ -149,7 +149,7 @@
 }
 
 .section-padding {
-  @apply py-20 md:py-20;
+  @apply py-8 md:py-16;
 }
 
 .animated-border-container {
@@ -192,3 +192,10 @@
   animation: marquee 45s linear infinite;
   display: flex;
 }
+
+body.video-playing .hide-on-video {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
