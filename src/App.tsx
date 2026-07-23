@@ -1104,7 +1104,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
   })).filter(album => album.works.length > 0);
 
   const filteredWorks = works.filter(w => {
-    if (activeCategory === 'portfolio.all') return false;
+    if (activeCategory === 'portfolio.all') return true;
     return w.category === activeCategory;
   });
   
@@ -1155,10 +1155,18 @@ const Portfolio = ({ works }: { works: Work[] }) => {
             {t('portfolio.subtitle')}
           </p>
         </div>
-        <div className="flex gap-4">
-          <div className="w-16 h-16 rounded-full border border-black/10 dark:border-white/10 flex items-center justify-center text-amber-500 group hover:border-amber-500 transition-colors cursor-pointer">
-            <ArrowLeft className="w-6 h-6 rotate-45 group-hover:rotate-0 transition-transform" />
-          </div>
+        <div className="flex flex-wrap gap-4 mt-4 md:mt-0 items-center w-full md:w-auto">
+          <motion.a 
+            href="https://drive.google.com/drive/folders/19dWs-PU3rLrrE7orKldK8ENZ_L_pVbAW"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(255,138,0,0.5)" }}
+            whileTap={{ scale: 0.95 }}
+            className="btn-primary text-sm md:text-base px-6 py-3 md:px-8 md:py-4 flex items-center justify-center gap-3 w-full sm:w-auto rounded-xl sm:rounded-full bg-gradient-to-r from-amber-500 to-amber-400 text-black font-bold shadow-[0_5px_15px_rgba(255,138,0,0.3)] border border-amber-300/50"
+          >
+            {language === 'ar' ? 'لمشاهدة جميع المشاريع والأعمال السابقة اضغط هنا' : 'To view all previous projects and work, click here'}
+            <ArrowLeft className="w-5 h-5 rtl:rotate-0 ltr:rotate-180 transition-transform" />
+          </motion.a>
         </div>
       </div>
 
@@ -1199,9 +1207,21 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                 </div>
                 <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 drop-shadow-md">{language === 'ar' ? 'ألبوم الأعمال' : 'Our Portfolio'}</h3>
                 <p className="text-white/80 text-sm md:text-base font-bold mb-4">{works.length} {language === 'ar' ? 'صورة ومقطع مرئي' : 'Photos & Videos'}</p>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity delay-100 uppercase tracking-wider">
-                   {language === 'ar' ? 'انقر لاستعراض الألبوم' : 'Click to Browse Album'}
-                   <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
+                <div className="flex flex-col gap-3 items-center w-full">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity delay-100 uppercase tracking-wider mb-2">
+                     {language === 'ar' ? 'انقر لاستعراض الألبوم' : 'Click to Browse Album'}
+                     <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
+                  </div>
+                  <a 
+                    href="https://drive.google.com/drive/folders/19dWs-PU3rLrrE7orKldK8ENZ_L_pVbAW"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="btn-primary text-sm md:text-base px-6 py-3 flex items-center justify-center gap-3 w-full max-w-[250px] rounded-xl bg-gradient-to-r from-[#FF8A00] to-[#FFC300] text-black font-black shadow-[0_5px_15px_rgba(255,138,0,0.4)] hover:scale-105 transition-transform opacity-0 group-hover:opacity-100 delay-150"
+                  >
+                    {language === 'ar' ? 'لمشاهدة جميع المشاريع والأعمال السابقة اضغط هنا' : 'To view all previous projects and work, click here'}
+                    <Layout className="w-5 h-5" />
+                  </a>
                 </div>
               </div>
             </div>
