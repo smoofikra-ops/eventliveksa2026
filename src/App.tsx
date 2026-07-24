@@ -38,7 +38,7 @@ export const getVideoEmbedUrl = (url?: string, autoplay = true) => {
   if (!url) return '';
   if (url.includes('drive.google.com')) {
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (match) return `https://drive.google.com/file/d/${match[1]}/preview?autoplay=${autoplay ? 1 : 0}`;
+    if (match) return `https://drive.google.com/file/d/${match[1]}/preview?autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}`;
   }
   const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
   const match = url.match(ytRegExp);
@@ -855,8 +855,7 @@ const Services = ({ services }: { services: Service[] }) => {
                     src={getOptimizedImageUrl(s.cardBgImage)} 
                     alt={s.title} 
                     className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-110 z-0 scale-105`}
-                    loading="lazy"
-                  />
+                    loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
                 </>
               )}
@@ -1057,8 +1056,12 @@ const PortfolioMediaContent = ({ w, isIframeVideo, getVideoEmbedUrl, selectedWor
 };
 
 const Portfolio = ({ works }: { works: Work[] }) => {
-  const { t, language } = useLanguage();
+    const { t, language } = useLanguage();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isGridOpen, setIsGridOpen] = useState(false);
+  const [gridPage, setGridPage] = useState(0);
+  const ITEMS_PER_PAGE = window.innerWidth < 768 ? 9 : 12;
+
 
   useEffect(() => {
     if (selectedIndex !== null) {
@@ -1175,7 +1178,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
           className="relative group cursor-pointer w-full max-w-[280px] sm:max-w-sm md:max-w-md aspect-[4/5] mx-auto"
           style={{ perspective: '1000px' }}
           onClick={() => {
-            setSelectedIndex(0);
+            setIsGridOpen(true); setGridPage(0);
           }}
         >
           {/* Stack effect images (shadows/depth) */}
@@ -1191,13 +1194,10 @@ const Portfolio = ({ works }: { works: Work[] }) => {
 
           {/* Main Cover */}
           <div className="absolute inset-0 bg-white dark:bg-[#111] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:-translate-y-4 group-hover:scale-[1.02] overflow-hidden border border-black/5 dark:border-white/10 z-10 flex flex-col">
-            {works[0] && (
-              <img 
-                src={getOptimizedImageUrl(works[0].img)} 
+            <img src="/portfolio_cover.jpg" 
                 alt="Main Album"
                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                loading="lazy" />
-            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-8">
               <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex flex-col items-center text-center">
                 <div className="flex justify-center mb-4">
@@ -1207,21 +1207,9 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                 </div>
                 <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 drop-shadow-md">{language === 'ar' ? 'ألبوم الأعمال' : 'Our Portfolio'}</h3>
                 <p className="text-white/80 text-sm md:text-base font-bold mb-4">{works.length} {language === 'ar' ? 'صورة ومقطع مرئي' : 'Photos & Videos'}</p>
-                <div className="flex flex-col gap-3 items-center w-full">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity delay-100 uppercase tracking-wider mb-2">
-                     {language === 'ar' ? 'انقر لاستعراض الألبوم' : 'Click to Browse Album'}
-                     <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
-                  </div>
-                  <a 
-                    href="https://drive.google.com/drive/folders/19dWs-PU3rLrrE7orKldK8ENZ_L_pVbAW"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="btn-primary text-sm md:text-base px-6 py-3 flex items-center justify-center gap-3 w-full max-w-[250px] rounded-xl bg-gradient-to-r from-[#FF8A00] to-[#FFC300] text-black font-black shadow-[0_5px_15px_rgba(255,138,0,0.4)] hover:scale-105 transition-transform opacity-0 group-hover:opacity-100 delay-150"
-                  >
-                    {language === 'ar' ? 'لمشاهدة جميع المشاريع والأعمال السابقة اضغط هنا' : 'To view all previous projects and work, click here'}
-                    <Layout className="w-5 h-5" />
-                  </a>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity delay-100 uppercase tracking-wider">
+                   {language === 'ar' ? 'انقر لاستعراض الألبوم' : 'Click to Browse Album'}
+                   <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
                 </div>
               </div>
             </div>
@@ -1229,6 +1217,95 @@ const Portfolio = ({ works }: { works: Work[] }) => {
         </div>
       </div>
     </SectionWrapper>
+
+    
+    <AnimatePresence>
+      {isGridOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[150] bg-[#050505] flex flex-col p-4 md:p-8"
+          dir={language === 'ar' ? 'rtl' : 'ltr'}
+        >
+          <div className="flex justify-between items-center mb-6 z-[160]">
+             <h3 className="text-2xl md:text-3xl font-black text-white">{language === 'ar' ? 'ألبوم الأعمال' : 'Our Portfolio'}</h3>
+             <button
+               onClick={() => setIsGridOpen(false)}
+               className="flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-amber-500 text-white hover:text-black rounded-full transition-all"
+             >
+               <X className="w-5 h-5" />
+               <span>{language === 'ar' ? 'إغلاق' : 'Close'}</span>
+             </button>
+          </div>
+          
+          <div className="flex-1 relative w-full h-full">
+            <div className="text-center text-white/50 text-sm mb-4">
+              <SwipeHint customText={language === 'ar' ? 'اسحب لليمين أو اليسار للتنقل بين صفحات الألبوم' : 'Swipe left or right to navigate pages'} />
+            </div>
+            
+            <motion.div
+              key={gridPage}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(e, { offset }) => {
+                 const swipeX = offset.x;
+                 const isRtl = language === 'ar';
+                 const maxPages = Math.ceil(filteredWorks.length / ITEMS_PER_PAGE);
+                 if (swipeX < -50) {
+                    if (isRtl) setGridPage(p => Math.max(0, p - 1));
+                    else setGridPage(p => Math.min(maxPages - 1, p + 1));
+                 } else if (swipeX > 50) {
+                    if (isRtl) setGridPage(p => Math.min(maxPages - 1, p + 1));
+                    else setGridPage(p => Math.max(0, p - 1));
+                 }
+              }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 auto-rows-max overflow-y-auto max-h-[70vh] pb-20"
+            >
+              {filteredWorks.slice(gridPage * ITEMS_PER_PAGE, (gridPage + 1) * ITEMS_PER_PAGE).map((work, idx) => (
+                <div 
+                  key={work.id} 
+                  className="relative aspect-square cursor-pointer group rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-amber-500/50 transition-all"
+                  onClick={() => setSelectedIndex(gridPage * ITEMS_PER_PAGE + idx)}
+                >
+                  <img src={getOptimizedImageUrl(work.img)} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt="" loading="lazy" />
+                  {work.videoUrl && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-amber-500 text-black flex items-center justify-center pl-1 shadow-lg">
+                        <Play className="w-5 h-5" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </motion.div>
+          </div>
+          
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-black/80 px-6 py-3 rounded-full border border-white/10 backdrop-blur-md">
+             <button 
+               onClick={() => setGridPage(p => Math.max(0, p - 1))}
+               disabled={gridPage === 0}
+               className="p-2 text-white disabled:opacity-30 hover:text-amber-500 transition-colors"
+             >
+               <ChevronLeft className="w-6 h-6 ltr:rotate-0 rtl:rotate-180" />
+             </button>
+             <span className="text-white/80 font-mono text-sm font-bold">
+               {gridPage + 1} / {Math.ceil(filteredWorks.length / ITEMS_PER_PAGE)}
+             </span>
+             <button 
+               onClick={() => setGridPage(p => Math.min(Math.ceil(filteredWorks.length / ITEMS_PER_PAGE) - 1, p + 1))}
+               disabled={gridPage >= Math.ceil(filteredWorks.length / ITEMS_PER_PAGE) - 1}
+               className="p-2 text-white disabled:opacity-30 hover:text-amber-500 transition-colors"
+             >
+               <ChevronLeft className="w-6 h-6 ltr:rotate-180 rtl:rotate-0" />
+             </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
 
     <AnimatePresence>
       {selectedWork && (
