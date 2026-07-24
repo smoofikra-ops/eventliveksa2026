@@ -1,7 +1,7 @@
 import urllib.request
 import re
 
-url = "https://drive.google.com/uc?export=download&id=1ndvNPiH-WplY1W_IUkJi4LDMUJ-Q7frJ"
+url = "https://drive.google.com/uc?export=download&id=1-bKKZ4v6ZxXs9lcDtJBSMGFZApj9oKbE"
 req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 try:
     with urllib.request.urlopen(req) as response:
@@ -11,7 +11,7 @@ try:
         if uuid_match and confirm_match:
             uuid = uuid_match.group(1)
             confirm = confirm_match.group(1)
-            final_url = f"https://drive.usercontent.google.com/download?id=1ndvNPiH-WplY1W_IUkJi4LDMUJ-Q7frJ&export=download&confirm={confirm}&uuid={uuid}"
+            final_url = f"https://drive.usercontent.google.com/download?id=1-bKKZ4v6ZxXs9lcDtJBSMGFZApj9oKbE&export=download&confirm={confirm}&uuid={uuid}"
             print("Final URL:", final_url)
             
             # Let's see if final_url works (should return a redirect or the video itself)

@@ -23,7 +23,7 @@ export const getDirectVideoUrl = (url: string) => {
   if (!url) return '';
   if (url.includes('drive.google.com')) {
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (match) return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+    if (match) return `/api/video/${match[1]}`;
   }
   return url;
 };
@@ -31,19 +31,19 @@ export const getDirectVideoUrl = (url: string) => {
 
 export const isIframeVideo = (url?: string) => {
   if (!url) return false;
-  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('drive.google.com');
+  return url.includes('youtube.com') || url.includes('youtu.be');
 };
 
 export const getVideoEmbedUrl = (url?: string, autoplay = true) => {
   if (!url) return '';
   if (url.includes('drive.google.com')) {
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (match) return `https://drive.google.com/file/d/${match[1]}/preview?autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}`;
+    if (match) return `https://drive.google.com/file/d/${match[1]}/preview?autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}&playsinline=1`;
   }
   const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
   const match = url.match(ytRegExp);
   if (match && match[2].length === 11) {
-    return `https://www.youtube.com/embed/${match[2]}?autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}&loop=1&playlist=${match[2]}&controls=${autoplay ? 0 : 1}&showinfo=0&rel=0&iv_load_policy=3`;
+    return `https://www.youtube.com/embed/${match[2]}?autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}&playsinline=1&loop=1&playlist=${match[2]}&controls=${autoplay ? 0 : 1}&showinfo=0&rel=0&iv_load_policy=3`;
   }
   return url;
 };
@@ -979,6 +979,7 @@ const Services = ({ services }: { services: Service[] }) => {
                   <video
                     src={getDirectVideoUrl(currentVideoUrl)}
                     autoPlay
+                    muted
                     controls
                     playsInline
                     className="w-full h-full object-contain pointer-events-auto"
@@ -1399,6 +1400,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                   <video 
                     src={getDirectVideoUrl(selectedWork.videoUrl!)} 
                     autoPlay 
+                    muted
                     controls 
                     playsInline
                     poster={selectedWork.img}
