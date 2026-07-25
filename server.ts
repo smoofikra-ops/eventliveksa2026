@@ -9,35 +9,43 @@ const PORT = 3000;
 // API route to proxy Google Drive videos
 app.get("/api/video/:id", (req, res) => {
   const videoId = req.params.id;
-  const url = `https://drive.google.com/uc?export=download&id=${videoId}`;
+  const initialUrl = `https://drive.google.com/uc?export=download&id=${videoId}`;
   
-  https.get(url, (response) => {
-    let data = '';
-    response.on('data', (chunk) => {
-      data += chunk;
-    });
-    
-    response.on('end', () => {
-      const uuidMatch = data.match(/name="uuid" value="([^"]+)"/);
-      const confirmMatch = data.match(/name="confirm" value="([^"]+)"/);
-      
-      if (uuidMatch && confirmMatch) {
-        const uuid = uuidMatch[1];
-        const confirm = confirmMatch[1];
-        const finalUrl = `https://drive.usercontent.google.com/download?id=${videoId}&export=download&confirm=${confirm}&uuid=${uuid}`;
-        res.redirect(302, finalUrl);
-      } else {
-        // If it's a smaller file, drive.google.com/uc might just redirect immediately
-        if (response.statusCode === 303 || response.statusCode === 302) {
-           res.redirect(302, response.headers.location || '');
+  const handleUrl = (url: string) => {
+    https.get(url, (response) => {
+      if (response.statusCode === 302 || response.statusCode === 303) {
+        const location = response.headers.location;
+        if (location) {
+          handleUrl(location);
         } else {
-           res.status(500).send("Could not parse Drive confirmation tokens");
+          res.status(500).send("Redirect without location");
+        }
+      } else {
+        const contentType = response.headers['content-type'] || '';
+        if (contentType.includes('text/html')) {
+          let data = '';
+          response.on('data', chunk => { data += chunk; });
+          response.on('end', () => {
+            const uuidMatch = data.match(/name="uuid" value="([^"]+)"/);
+            const confirmMatch = data.match(/name="confirm" value="([^"]+)"/);
+            if (uuidMatch && confirmMatch) {
+              const finalUrl = `https://drive.usercontent.google.com/download?id=${videoId}&export=download&confirm=${confirmMatch[1]}&uuid=${uuidMatch[1]}`;
+              res.redirect(302, finalUrl);
+            } else {
+              res.status(500).send("Could not parse Drive confirmation tokens");
+            }
+          });
+        } else {
+          // If it's directly serving the video, just redirect the client to this URL
+          res.redirect(302, url);
         }
       }
+    }).on('error', (err) => {
+      res.status(500).send(err.message);
     });
-  }).on('error', (err) => {
-    res.status(500).send(err.message);
-  });
+  };
+
+  handleUrl(initialUrl);
 });
 
 async function startServer() {

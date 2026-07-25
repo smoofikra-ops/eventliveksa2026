@@ -30,7 +30,7 @@ export const getDirectVideoUrl = (url: string) => {
 
 export const isIframeVideo = (url?: string) => {
   if (!url) return false;
-  return url.includes('youtube.com') || url.includes('youtu.be');
+  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('drive.google.com');
 };
 
 export const getVideoEmbedUrl = (url?: string, autoplay = true) => {
@@ -511,6 +511,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             onClick={() => setIsOpen(false)}
             className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[90]"
           />
@@ -520,8 +521,8 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
       <motion.div
         initial={{ x: language === 'ar' ? "-100%" : "100%" }}
         animate={{ x: isOpen ? 0 : (language === 'ar' ? "-100%" : "100%") }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className={`md:hidden fixed top-0 bottom-0 w-[280px] bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-3xl z-[95] border-black/10 dark:border-white/10 flex flex-col p-6 shadow-2xl ${language === "ar" ? "left-0 border-r" : "right-0 border-l"}`}
+        transition={{ type: "spring", damping: 30, stiffness: 250, mass: 0.8 }}
+        className={`md:hidden fixed top-0 bottom-0 w-[300px] bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-3xl z-[95] border-black/10 dark:border-white/10 flex flex-col p-6 shadow-2xl ${language === "ar" ? "left-0 border-r" : "right-0 border-l"}`}
       >
         <div className="flex items-center gap-2 mb-10 mt-2">
           <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-10 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
@@ -529,7 +530,12 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
 
         <ul className="space-y-2 flex-1" onMouseLeave={() => setHoveredIndex(null)}>
           {navLinks.map((link, idx) => (
-            <li key={idx} className="relative z-10" onMouseEnter={() => setHoveredIndex(idx)}>
+            <motion.li 
+              key={idx} 
+              className="relative z-10" 
+              onMouseEnter={() => setHoveredIndex(idx)}
+              whileTap={{ scale: 0.95 }}
+            >
               <a 
                 href={link.href} 
                 onClick={(e) => {
@@ -550,7 +556,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
-            </li>
+            </motion.li>
           ))}
         </ul>
 
@@ -973,6 +979,7 @@ const Services = ({ services }: { services: Service[] }) => {
                     className="w-full h-full pointer-events-auto"
                     allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
                     allowFullScreen
+                    loading="lazy"
                   ></iframe>
                 ) : (
                   <video
@@ -989,6 +996,7 @@ const Services = ({ services }: { services: Service[] }) => {
                   src={getOptimizedImageUrl(currentService.mediaValue || currentService.cardBgImage)} 
                   className="w-full h-full object-contain pointer-events-none" 
                   alt={currentService.title} 
+                  loading="lazy"
                 />
               )}
 
@@ -1394,6 +1402,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                     className="w-full h-full pointer-events-auto"
                     allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
                     allowFullScreen
+                    loading="lazy"
                   ></iframe>
                 ) : (
                   <video 
