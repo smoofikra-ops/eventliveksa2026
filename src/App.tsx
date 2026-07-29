@@ -30,7 +30,7 @@ export const getDirectVideoUrl = (url: string) => {
 
 export const isIframeVideo = (url?: string) => {
   if (!url) return false;
-  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('drive.google.com');
+  return url.includes('youtube.com') || url.includes('youtu.be');
 };
 
 export const getVideoEmbedUrl = (url?: string, autoplay = true) => {
@@ -250,7 +250,7 @@ const INITIAL_DATA: AppData = {
     { platform: 'instagram', url: 'https://instagram.com/eventliveksa' },
     { platform: 'linkedin', url: 'https://linkedin.com/company/eventliveksa' },
     { platform: 'snapchat', url: 'https://snapchat.com/add/eventliveksa' },
-    { platform: 'tiktok', url: 'https://tiktok.com/@eventliveksa' }
+    { platform: 'tiktok', url: 'https://www.tiktok.com/@eventlivesa' }
   ]
 };
 
@@ -1202,7 +1202,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
 
           {/* Main Cover */}
           <div className="absolute inset-0 bg-white dark:bg-[#111] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:-translate-y-4 group-hover:scale-[1.02] overflow-hidden border border-black/5 dark:border-white/10 z-10 flex flex-col">
-            <img src="https://res.cloudinary.com/ozd726ro/image/upload/v1784930044/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_%D9%85%D9%87%D8%B1%D8%AC%D8%A7%D9%86_%D8%A7%D9%84%D8%B3%D8%B1%D8%B7%D8%A7%D9%86_1_zxm8qw.jpg" 
+            <img src="https://res.cloudinary.com/ozd726ro/image/upload/v1783983621/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_%D9%81%D8%B9%D8%A7%D9%84%D9%8A%D8%A9_%D9%8A%D9%88%D9%85_%D8%A7%D9%84%D8%AA%D8%A7%D8%B3%D9%8A%D8%B3_vmveuk.jpg" 
                 alt="Main Album"
                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                loading="lazy" />
