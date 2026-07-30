@@ -30,7 +30,7 @@ export const getDirectVideoUrl = (url: string) => {
 
 export const isIframeVideo = (url?: string) => {
   if (!url) return false;
-  return url.includes('youtube.com') || url.includes('youtu.be');
+  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('drive.google.com');
 };
 
 export const getVideoEmbedUrl = (url?: string, autoplay = true) => {
