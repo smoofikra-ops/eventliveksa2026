@@ -16,6 +16,12 @@ import {
   Key, Shield, Bell, Calendar, Clock, Search, Filter, Wrench, ShoppingCart, CreditCard,
   Truck, Plane, Train, Bike, Car, Anchor, Sun, Moon, CloudRain, Wind, Snowflake, Flame, Droplet, Languages, Volume2, VolumeX, Ghost, Menu
 } from "lucide-react";
+
+import { StorySection } from './components/cinematic/StorySection';
+import { cinematicScenes } from './data/cinematicScenes';
+import { CinematicBackground } from './components/cinematic/CinematicBackground';
+import { ActiveSceneProvider, useActiveScene } from './hooks/useActiveScene';
+
 import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { useLanguage } from "./LanguageContext";
 
@@ -271,7 +277,7 @@ const HoverLinkGroup = ({ links, className = "space-y-4", id = "group" }: { link
     <ul className={`relative z-20 ${className}`} onMouseLeave={() => setHoveredIndex(null)}>
       {links.map((link, idx) => (
         <li key={idx} className="relative z-10" onMouseEnter={() => setHoveredIndex(idx)}>
-          <a href={link.href} className="relative z-10 block px-4 py-2 font-bold text-black/80 dark:text-white/90 hover:text-black dark:hover:text-white transition-colors duration-300 cursor-pointer pointer-events-auto">
+          <a href={link.href} className="relative z-10 block px-4 py-2 font-bold text-white/90 hover:text-black dark:hover:text-white transition-colors duration-300 cursor-pointer pointer-events-auto">
             {link.label}
           </a>
           {hoveredIndex === idx && (
@@ -315,7 +321,7 @@ const MouseFollower = () => {
 
 const SectionWrapper = ({ children, id, className = "", ...props }: { children: React.ReactNode, id?: string, className?: string } & React.HTMLAttributes<HTMLElement>) => {
   return (
-    <section id={id} className={`section-padding relative overflow-hidden ${className}`} {...props}>
+    <StorySection id={id || ''} className={`section-padding relative overflow-hidden ${className}`} {...props}>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -326,19 +332,42 @@ const SectionWrapper = ({ children, id, className = "", ...props }: { children: 
         {children}
       </motion.div>
       
-      {/* Animated Gradient Border Overlay (Optional, can be applied to specific containers) */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-    </section>
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent overflow-hidden">
+        <motion.div 
+          initial={{ x: '-100%' }}
+          whileInView={{ x: '200%' }}
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 3, ease: "easeInOut", repeat: Infinity, repeatDelay: 5 }}
+          className="w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent"
+        />
+      </div>
+    </StorySection>
   );
 };
 
-const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, key?: React.Key, className?: string }) => {
+type AnimationType = 'fade-up' | 'fade-down' | 'fade-left' | 'fade-right' | 'diagonal-left' | 'diagonal-right' | 'fade';
+
+const getAnimationVariants = (type: AnimationType = 'fade-up', distance: number = 30) => {
+  switch (type) {
+    case 'fade-up': return { initial: { opacity: 0, y: distance }, whileInView: { opacity: 1, y: 0 } };
+    case 'fade-down': return { initial: { opacity: 0, y: -distance }, whileInView: { opacity: 1, y: 0 } };
+    case 'fade-left': return { initial: { opacity: 0, x: distance }, whileInView: { opacity: 1, x: 0 } };
+    case 'fade-right': return { initial: { opacity: 0, x: -distance }, whileInView: { opacity: 1, x: 0 } };
+    case 'diagonal-left': return { initial: { opacity: 0, x: distance, y: distance }, whileInView: { opacity: 1, x: 0, y: 0 } };
+    case 'diagonal-right': return { initial: { opacity: 0, x: -distance, y: distance }, whileInView: { opacity: 1, x: 0, y: 0 } };
+    case 'fade': return { initial: { opacity: 0 }, whileInView: { opacity: 1 } };
+    default: return { initial: { opacity: 0, y: distance }, whileInView: { opacity: 1, y: 0 } };
+  }
+}
+
+const ScrollReveal = ({ children, delay = 0, className = "", type = "fade-up", distance = 30, once = true }: { children: React.ReactNode, delay?: number, key?: React.Key, className?: string, type?: AnimationType, distance?: number, once?: boolean }) => {
+  const variants = getAnimationVariants(type, distance);
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      initial={variants.initial}
+      whileInView={variants.whileInView}
+      viewport={{ once, margin: "-10%" }}
+      transition={{ duration: 1.0, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}
@@ -407,7 +436,7 @@ const ThemeToggle = () => {
   };
 
   return (
-    <button onClick={toggleTheme} className="p-2 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-amber-500">
+    <button onClick={toggleTheme} className="p-2 rounded-full bg-bdark:/5 hover:bg-black/10 dark:hover:/10 transition-colors text-amber-500">
       {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
     </button>
   );
@@ -417,6 +446,12 @@ const ThemeToggle = () => {
 const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: () => void, isAdminMode: boolean, onQuoteClick: () => void }) => {
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
+  const { activeSceneId } = useActiveScene();
+  
+  const currentScene = cinematicScenes.find(s => s.id === activeSceneId) || cinematicScenes[0];
+  const isDarkTheme = currentScene.headerTheme === 'dark';
+  const textColorClass = isDarkTheme ? 'text-white/80 hover:text-white' : 'text-black/80 hover:text-black';
+  const logoClass = isDarkTheme ? 'brightness-100' : 'brightness-0';
 
   const navLinks = [
     { label: t('nav.home'), href: '#home', icon: <Camera className="w-5 h-5" /> },
@@ -432,10 +467,10 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
     <>
 
       {/* Desktop Navigation */}
-      <div className="hide-on-video hidden md:flex fixed top-10 left-0 right-0 z-[90] h-20 items-center px-8 bg-white/60 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border-b border-black/10 dark:border-white/10 shadow-sm transition-all justify-between">
+      <div className="hide-on-video hidden md:flex fixed top-10 left-0 right-0 z-[90] h-20 items-center px-8 bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-sm transition-all justify-between">
         <div className="w-[100px] xl:w-[200px] flex justify-start items-center">
           <a href="#home" className="flex items-center">
-            <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-10 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)] transition-transform hover:scale-105 duration-300"  loading="lazy" />
+            <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className={`h-10 object-contain transition-all duration-500 ${logoClass}`}  loading="lazy" />
           </a>
         </div>
         
@@ -445,7 +480,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
               <li key={idx} className="relative z-10" onMouseEnter={() => setHoveredIndex(idx)}>
                 <a 
                   href={link.href} 
-                  className="relative z-10 flex items-center gap-2 px-4 py-2 font-bold text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-colors duration-300 text-sm lg:text-base"
+                  className={`relative z-10 flex items-center gap-2 px-4 py-2 font-bold transition-colors duration-300 text-sm lg:text-base ${textColorClass}`}
                 >
                   {link.icon}
                   {link.label}
@@ -468,14 +503,14 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
         <div className="flex items-center gap-4">
           <button 
             onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
-            className="px-4 py-2 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors font-bold text-sm"
+            className="px-4 py-2 rounded-full bg-bdark:/5 hover:bg-black/10 dark:hover:/10 transition-colors font-bold text-sm"
           >
             {language === 'ar' ? 'English' : 'عربي'}
           </button>
           <ThemeToggle />
           <button 
             onClick={onAdminClick}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isAdminMode ? 'bg-amber-500 text-black' : 'bg-black/5 dark:bg-white/5 text-black/70 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10'}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isAdminMode ? 'bg-amber-500 text-black' : 'bg-white/5 text-white/70 hover:bg-black/10 dark:hover:bg-white/10'}`}
           >
             <Settings className="w-5 h-5" />
           </button>
@@ -488,7 +523,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
         </div>
       </div>
       {/* Mobile Navigation Header */}
-      <div className="hide-on-video md:hidden fixed top-10 left-0 right-0 z-[100] h-16 flex items-center justify-between px-4 bg-white/60 dark:bg-[#0a0a0a]/60 backdrop-blur-xl border-b border-black/10 dark:border-white/10 shadow-sm">
+      <div className="hide-on-video md:hidden fixed top-10 left-0 right-0 z-[100] h-16 flex items-center justify-between px-4 bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-sm">
         <div className="flex-1 flex justify-start">
           <a href="#home" className="flex items-center">
             <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-8 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
@@ -498,7 +533,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
         <div className="flex-1 flex justify-end">
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="w-10 h-10 bg-black/80 dark:bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 shadow-md hover:bg-amber-500 hover:text-black transition-colors"
+            className="w-10 h-10 bg-black/80 dark:/10 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 shadow-md hover:bg-amber-500 hover:text-black transition-colors"
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -522,7 +557,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
         initial={{ x: language === 'ar' ? "-100%" : "100%" }}
         animate={{ x: isOpen ? 0 : (language === 'ar' ? "-100%" : "100%") }}
         transition={{ type: "spring", damping: 30, stiffness: 250, mass: 0.8 }}
-        className={`md:hidden fixed top-0 bottom-0 w-[300px] bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-3xl z-[95] border-black/10 dark:border-white/10 flex flex-col p-6 shadow-2xl ${language === "ar" ? "left-0 border-r" : "right-0 border-l"}`}
+        className={`md:hidden fixed top-0 bottom-0 w-[300px] bg-[#0a0c0d]/90 backdrop-blur-3xl z-[95] border-white/10 flex flex-col p-6 shadow-2xl ${language === "ar" ? "left-0 border-r" : "right-0 border-l"}`}
       >
         <div className="flex items-center gap-2 mb-10 mt-2">
           <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-10 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
@@ -541,7 +576,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
                 onClick={(e) => {
                   setIsOpen(false);
                 }}
-                className="relative z-10 flex items-center gap-4 px-4 py-3 font-bold text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-colors duration-300"
+                className="relative z-10 flex items-center gap-4 px-4 py-3 font-bold text-white/70 hover:text-black dark:hover:text-white transition-colors duration-300"
               >
                 {link.icon}
                 {link.label}
@@ -560,11 +595,11 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
           ))}
         </ul>
 
-        <div className="flex flex-col gap-4 mt-8 pt-8 border-t border-black/10 dark:border-white/10">
+        <div className="flex flex-col gap-4 mt-8 pt-8 border-t border-white/10">
           <div className="flex items-center justify-between">
             <button 
               onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
-              className="px-4 py-2 rounded-full bg-black/5 dark:bg-white/5 font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              className="px-4 py-2 rounded-full bg-bdark:/5 font-bold hover:bg-black/10 dark:hover:/10 transition-colors"
             >
               {language === 'ar' ? 'English' : 'عربي'}
             </button>
@@ -577,7 +612,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
 
           <button 
             onClick={() => { setIsOpen(false); onAdminClick(); }}
-            className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold transition-all ${isAdminMode ? 'bg-amber-500 text-black' : 'bg-black/5 dark:bg-white/5 text-black/70 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10'}`}
+            className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold transition-all ${isAdminMode ? 'bg-amber-500 text-black' : 'bg-white/5 text-white/70 hover:bg-black/10 dark:hover:bg-white/10'}`}
           >
             <Settings className="w-5 h-5" />
             {t('nav.admin')}
@@ -625,81 +660,20 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
   const embedUrl = isIframeVideo(videoUrl) && videoUrl ? getVideoEmbedUrl(videoUrl) : '';
 
   return (
-    <section id="home" className="relative min-h-[100svh] flex flex-col md:flex-row md:items-center pt-20 overflow-hidden dark border-b border-white/10 bg-[#0a0a0a]">
-      {/* Background Video/Image (Desktop) & Inline Video (Mobile) */}
-      <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
-        <CameraFrameOverlay />
-        {videoUrl ? (
-          isIframeVideo(videoUrl) ? (
-            <div className="w-full h-full scale-110">
-              <iframe 
-                src={embedUrl}
-                className="w-full h-full pointer-events-none object-cover transition-opacity duration-1000 animate-in fade-in"
-                allow="autoplay; encrypted-media"
-                title="Hero Background"
-              ></iframe>
-            </div>
-          ) : (
-            <div className="w-full h-full relative">
-              <video 
-                autoPlay
-                muted={isMuted}
-                loop={true}
-                playsInline
-                preload="auto"
-                poster="https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1920/v1783983460/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_IMG_9484_siyppe.jpg"
-                className="w-full h-full object-cover bg-black"
-                style={{ objectPosition: 'center center' }}
-              >
-                {videoUrl && (
-                  <>
-                    <source src={getDirectVideoUrl(videoUrl)} type="video/mp4" />
-                    متصفحك لا يدعم تشغيل الفيديو.
-                  </>
-                )}
-              </video>
-              <button 
-                onClick={() => setIsMuted(!isMuted)}
-                className="absolute bottom-4 rtl:right-4 ltr:left-4 md:bottom-8 md:rtl:right-8 md:ltr:left-8 z-50 p-2 md:p-4 rounded-full bg-black/30 backdrop-blur-md border border-white/10 text-white hover:bg-black/50 transition-colors hover:scale-110 active:scale-95 group"
-                aria-label={isMuted ? "فتح الصوت" : "إغلاق الصوت"}
-              >
-                {isMuted ? (
-                  <VolumeX className="w-4 h-4 md:w-6 md:h-6 group-hover:text-amber-500 transition-colors" />
-                ) : (
-                  <Volume2 className="w-4 h-4 md:w-6 md:h-6 group-hover:text-amber-500 transition-colors" />
-                )}
-              </button>
-            </div>
-          )
-        ) : (
-          <div className="w-full h-full bg-[#111]"></div>
-        )}
-        
-        {/* Dark Overlay for text clarity on desktop */}
-        <div className="absolute inset-0 bg-black/40 dark:bg-black/50 pointer-events-none"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-black/40 to-transparent pointer-events-none"></div>
-      </div>
+    <StorySection id="hero" className="relative min-h-[100svh] flex flex-col md:flex-row md:items-center pt-20 overflow-hidden dark flex-grow">
+      <CameraFrameOverlay />
+      
+      {/* Cinematic gradient to ensure text readability */}
+      
 
-
-
-      {/* Animated Light Beams (Desktop only) */}
-      <div className="hidden md:block absolute inset-0 opacity-30 pointer-events-none z-0">
-        <motion.div 
-          animate={{ 
-            x: ["-100%", "100%"],
-            opacity: [0, 1, 0]
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className="absolute top-0 bottom-0 w-[500px] bg-gradient-to-r from-transparent via-[#FF8A00]/20 to-transparent skew-x-12"
-        />
-      </div>
+      
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-10 md:py-20 flex-1 flex flex-col justify-center items-center text-center">
         <motion.div 
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-4xl flex flex-col items-center" >
 
 
@@ -707,7 +681,7 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/10 dark:bg-white/5 backdrop-blur-md border border-black/10 dark:border-white/20 text-amber-500 md:text-amber-400 font-black mb-8" style={{ fontSize: "10px" }}
+            className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-amber-500 md:text-amber-400 font-black mb-8" style={{ fontSize: "10px" }}
           >
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
             {t('hero.badge')}
@@ -732,54 +706,55 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
             </motion.button>
           </div>
         </motion.div>
-      </div>
-    </section>
+          </div>
+    </StorySection>
   );
 };
 
 const StatsSection = () => {
   const { t, language } = useLanguage();
   return (
-    <SectionWrapper id="stats" className="bg-gray-50 dark:bg-[#050505] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="stats" className=" py-8 md:py-16 ">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10 md:mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-[40px] font-semibold text-black dark:text-white mb-6 md:mb-8 title-accent-center heading-gradient"
-          >
-            {t("stats.title")}
-          </motion.h2>
+          <ScrollReveal type="fade-down" distance={20}>
+            <h2 className="text-3xl md:text-[40px] font-semibold text-white mb-6 md:mb-8 title-accent-center heading-gradient">
+              {t("stats.title")}
+            </h2>
+          </ScrollReveal>
         </div>
         
-        <div className="animated-border-container group">
-          <div className="animated-border-gradient"></div>
-          
-          <div className="relative z-10 bg-gray-50 dark:bg-[#050505] rounded-[22px] p-6 md:p-20 border border-black/5 dark:border-white/5">
-            <div className="grid grid-cols-3 gap-4 md:gap-12">
-              <div className="flex flex-col items-center text-center">
-                <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
-                  <Counter value={348} />
-                </div>
-                <div className="text-[10px] md:text-lg text-black/70 dark:text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.events")}</div>
-              </div>
-              
-              <div className="flex flex-col items-center text-center border-x border-black/10 dark:border-white/10 px-2 md:px-0">
-                <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
-                  <Counter value={8} />
-                </div>
-                <div className="text-[10px] md:text-lg text-black/70 dark:text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.years")}</div>
-              </div>
-              
-              <div className="flex flex-col items-center text-center">
-                <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
-                  <Counter value={98} suffix="%" />
-                </div>
-                <div className="text-[10px] md:text-lg text-black/70 dark:text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.clients")}</div>
+        <ScrollReveal type="fade-up" delay={0.2} distance={30}>
+          <div className="animated-border-container group">
+            <div className="animated-border-gradient"></div>
+            
+            <div className="relative z-10 rounded-[22px] p-6 md:p-20 border ">
+              <div className="grid grid-cols-3 gap-4 md:gap-12">
+                <ScrollReveal type="fade-left" delay={0.4} distance={20} className="flex flex-col items-center text-center">
+                  <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
+                    <Counter value={348} />
+                  </div>
+                  <div className="text-[10px] md:text-lg text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.events")}</div>
+                </ScrollReveal>
+                
+                <ScrollReveal type="fade-up" delay={0.5} distance={20} className="flex flex-col items-center text-center border-x border-white/10 px-2 md:px-0">
+                  <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
+                    <Counter value={8} />
+                  </div>
+                  <div className="text-[10px] md:text-lg text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.cities")}</div>
+                </ScrollReveal>
+                
+                <ScrollReveal type="fade-right" delay={0.6} distance={20} className="flex flex-col items-center text-center">
+                  <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
+                    <Counter value={100} />
+                    <span className="text-xl sm:text-2xl md:text-5xl text-amber-500 absolute -top-1 sm:-top-2 md:-top-4 -right-2 sm:-right-4 md:-right-8">+</span>
+                  </div>
+                  <div className="text-[10px] md:text-lg text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.clients")}</div>
+                </ScrollReveal>
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </SectionWrapper>
   );
@@ -833,12 +808,16 @@ const Services = ({ services }: { services: Service[] }) => {
 
   return (
     <>
-      <SectionWrapper id="services" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
+      <SectionWrapper id="services" className=" py-8 md:py-16 ">
         <div className="text-center mb-12 md:mb-20">
-        <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("services.title")}</h2>
-        <p className="text-black/70 dark:text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal px-4">
-          {t("services.subtitle")}
-        </p>
+        <ScrollReveal type="fade-down" distance={20}>
+          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("services.title")}</h2>
+        </ScrollReveal>
+        <ScrollReveal type="fade-up" delay={0.2} distance={20}>
+          <p className="text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal px-4">
+            {t("services.subtitle")}
+          </p>
+        </ScrollReveal>
       </div>
       <div className="grid grid-cols-6 gap-2 sm:gap-4 md:gap-8 pb-8 w-full px-2 sm:px-4">
         {services.map((s, i) => {
@@ -852,14 +831,14 @@ const Services = ({ services }: { services: Service[] }) => {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
               onClick={() => setSelectedServiceIndex(i)}
-              className={`bg-white dark:bg-[#111] p-5 md:p-8 rounded-[2rem] transition-all duration-500 group cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[160px] sm:min-h-[250px] md:min-h-[350px] flex-shrink-0 w-full shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-l border-white/80 dark:border-white/10 border-b-4 border-r-4 border-black/5 dark:border-black/40 hover:-translate-y-2 hover:border-amber-500/30 dark:hover:border-amber-500/30 hover:shadow-[0_20px_40px_rgba(255,138,0,0.15)] ${spanClass}`}
+              className={`glass-card p-5 md:p-8 rounded-[2rem] transition-all duration-500 group cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[160px] sm:min-h-[250px] md:min-h-[350px] flex-shrink-0 w-full shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-l border-white/80 dark:border-white/10  hover:-translate-y-2 hover:border-amber-500/30 dark:hover:border-amber-500/30 hover:shadow-[0_20px_40px_rgba(255,138,0,0.15)] ${spanClass}`}
             >
               {s.cardBgImage && (
                 <>
                   <img 
                     src={getOptimizedImageUrl(s.cardBgImage)} 
                     alt={s.title} 
-                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-110 z-0 scale-105`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105 z-0 scale-100`}
                     loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
                 </>
@@ -917,7 +896,7 @@ const Services = ({ services }: { services: Service[] }) => {
               title={language === 'ar' ? 'السابق' : 'Previous'}
               aria-label="Previous"
             >
-              <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-0 rtl:rotate-180 transition-transform group-hover:scale-110" />
+              <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-0 rtl:rotate-180 transition-transform group-hover:scale-105" />
             </button>
 
             {/* Next Button - Always visible on Mobile & Desktop */}
@@ -935,7 +914,7 @@ const Services = ({ services }: { services: Service[] }) => {
               title={language === 'ar' ? 'التالي' : 'Next'}
               aria-label="Next"
             >
-              <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-180 rtl:rotate-0 transition-transform group-hover:scale-110" />
+              <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-180 rtl:rotate-0 transition-transform group-hover:scale-105" />
             </button>
 
             <motion.div
@@ -946,12 +925,12 @@ const Services = ({ services }: { services: Service[] }) => {
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               drag
               dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-              dragElastic={0.2}
+              dragElastic={0.6}
               onDragEnd={(e, { offset, velocity }) => {
                 const swipeX = offset.x;
                 const swipeY = offset.y;
                 const isRtl = language === 'ar';
-                if (Math.abs(swipeY) > 80 || Math.abs(velocity.y) > 400) {
+                if (Math.abs(swipeY) > 50 || Math.abs(velocity.y) > 200) {
                   setSelectedServiceIndex(null);
                 } else if (swipeX < -50 && selectedServiceIndex !== null) {
                   if (isRtl) setSelectedServiceIndex(selectedServiceIndex > 0 ? selectedServiceIndex - 1 : services.length - 1);
@@ -1028,7 +1007,12 @@ const PortfolioMediaContent = ({ w, isIframeVideo, getVideoEmbedUrl, selectedWor
 
   return (
     <>
-      <div className={`absolute inset-0 bg-black/10 dark:bg-white/10 animate-pulse z-0 transition-opacity duration-500 ${isLoaded ? 'opacity-0' : 'opacity-100'}`}></div>
+      <div className={`absolute inset-0 bg-white/5 z-0 transition-opacity duration-500 overflow-hidden ${isLoaded ? 'opacity-0' : 'opacity-100'}`}>
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ImageIcon className="w-8 h-8 text-white/20 animate-pulse" />
+        </div>
+      </div>
       {hasVideo && !selectedWork ? (
         isIframeVideo(w.videoUrl!) ? (
           <iframe 
@@ -1158,13 +1142,17 @@ const Portfolio = ({ works }: { works: Work[] }) => {
 
   return (
     <>
-      <SectionWrapper id="portfolio" className="py-8 md:py-16 border-b border-black/5 dark:border-white/5">
+      <SectionWrapper id="portfolio" className="py-8 md:py-16 border-b border-white/5">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
         <div>
-          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent heading-gradient truncate w-full max-w-full block">{t('portfolio.title')}</h2>
-          <p className="text-black/70 dark:text-white/80 max-w-[60ch] text-lg md:text-xl font-medium font-normal">
-            {t('portfolio.subtitle')}
-          </p>
+          <ScrollReveal type="fade-right" distance={20}>
+            <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent heading-gradient truncate w-full max-w-full block">{t('portfolio.title')}</h2>
+          </ScrollReveal>
+          <ScrollReveal type="fade-up" delay={0.2} distance={20}>
+            <p className="text-white/80 max-w-[60ch] text-lg md:text-xl font-medium font-normal">
+              {t('portfolio.subtitle')}
+            </p>
+          </ScrollReveal>
         </div>
         <div className="flex flex-wrap gap-4 mt-4 md:mt-0 items-center w-full md:w-auto">
           <motion.a 
@@ -1190,21 +1178,21 @@ const Portfolio = ({ works }: { works: Work[] }) => {
           }}
         >
           {/* Stack effect images (shadows/depth) */}
-          <div className="absolute inset-0 bg-white dark:bg-[#222] rounded-2xl transform rotate-[8deg] translate-x-8 md:translate-x-12 translate-y-4 scale-90 shadow-2xl transition-all duration-700 group-hover:rotate-[15deg] group-hover:translate-x-16 group-hover:translate-y-6 overflow-hidden border border-black/10 dark:border-white/10 opacity-60">
+          <div className="absolute inset-0  rounded-2xl transform rotate-[8deg] translate-x-8 md:translate-x-12 translate-y-4 scale-90 shadow-2xl transition-all duration-700 group-hover:rotate-[15deg] group-hover:translate-x-16 group-hover:translate-y-6 overflow-hidden border-white/10 opacity-60">
              {works[2] && <img src={getOptimizedImageUrl(works[2].img)} className="w-full h-full object-cover blur-[2px] grayscale-[30%]" alt="bg"  loading="lazy" />}
              <div className="absolute inset-0 bg-black/30"></div>
           </div>
           
-          <div className="absolute inset-0 bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl transform -rotate-[6deg] -translate-x-6 md:-translate-x-10 translate-y-2 scale-95 shadow-2xl transition-all duration-700 group-hover:-rotate-[12deg] group-hover:-translate-x-14 group-hover:translate-y-4 overflow-hidden border border-black/10 dark:border-white/10 opacity-80">
+          <div className="absolute inset-0 bg-gray-100  rounded-2xl transform -rotate-[6deg] -translate-x-6 md:-translate-x-10 translate-y-2 scale-95 shadow-2xl transition-all duration-700 group-hover:-rotate-[12deg] group-hover:-translate-x-14 group-hover:translate-y-4 overflow-hidden border border-white/10 opacity-80">
              {works[1] && <img src={getOptimizedImageUrl(works[1].img)} className="w-full h-full object-cover blur-[1px] grayscale-[20%]" alt="bg"  loading="lazy" />}
              <div className="absolute inset-0 bg-black/20"></div>
           </div>
 
           {/* Main Cover */}
-          <div className="absolute inset-0 bg-white dark:bg-[#111] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:-translate-y-4 group-hover:scale-[1.02] overflow-hidden border border-black/5 dark:border-white/10 z-10 flex flex-col">
+          <div className="absolute inset-0  rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:-translate-y-4 group-hover:scale-[1.02] overflow-hidden border dark:border-white/10 z-10 flex flex-col">
             <img src="https://res.cloudinary.com/ozd726ro/image/upload/v1783983621/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_%D9%81%D8%B9%D8%A7%D9%84%D9%8A%D8%A9_%D9%8A%D9%88%D9%85_%D8%A7%D9%84%D8%AA%D8%A7%D8%B3%D9%8A%D8%B3_vmveuk.jpg" 
                 alt="Main Album"
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-8">
               <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex flex-col items-center text-center">
@@ -1215,7 +1203,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                 </div>
                 <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 drop-shadow-md">{language === 'ar' ? 'ألبوم الأعمال' : 'Our Portfolio'}</h3>
                 <p className="text-white/80 text-sm md:text-base font-bold mb-4">{works.length} {language === 'ar' ? 'صورة ومقطع مرئي' : 'Photos & Videos'}</p>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity delay-100 uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/30 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity delay-100 uppercase tracking-wider">
                    {language === 'ar' ? 'انقر لاستعراض الألبوم' : 'Click to Browse Album'}
                    <ArrowLeft className="w-4 h-4 rtl:rotate-0 ltr:rotate-180" />
                 </div>
@@ -1240,7 +1228,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
              <h3 className="text-2xl md:text-3xl font-black text-white">{language === 'ar' ? 'ألبوم الأعمال' : 'Our Portfolio'}</h3>
              <button
                onClick={() => setIsGridOpen(false)}
-               className="flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-amber-500 text-white hover:text-black rounded-full transition-all"
+               className="flex items-center justify-center gap-2 px-4 py-2 bg-black/40 hover:bg-amber-500 text-white hover:text-black rounded-full transition-all"
              >
                <X className="w-5 h-5" />
                <span>{language === 'ar' ? 'إغلاق' : 'Close'}</span>
@@ -1274,12 +1262,15 @@ const Portfolio = ({ works }: { works: Work[] }) => {
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 auto-rows-max overflow-y-auto max-h-[70vh] pb-20"
             >
               {filteredWorks.slice(gridPage * ITEMS_PER_PAGE, (gridPage + 1) * ITEMS_PER_PAGE).map((work, idx) => (
-                <div 
+                <motion.div 
                   key={work.id} 
-                  className="relative aspect-square cursor-pointer group rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-amber-500/50 transition-all"
+                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: idx * 0.05, ease: "easeOut" }}
+                  className="relative aspect-square cursor-pointer group rounded-xl overflow-hidden bg-black/40 border border-white/10 hover:border-amber-500/50 transition-all"
                   onClick={() => setSelectedIndex(gridPage * ITEMS_PER_PAGE + idx)}
                 >
-                  <img src={getOptimizedImageUrl(work.img)} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt="" loading="lazy" />
+                  <img src={getOptimizedImageUrl(work.img)} className="w-full h-full object-cover transition-transform group-hover:scale-105" alt="" loading="lazy" />
                   {work.videoUrl && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
                       <div className="w-10 h-10 rounded-full bg-amber-500 text-black flex items-center justify-center pl-1 shadow-lg">
@@ -1287,7 +1278,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                       </div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </div>
@@ -1345,7 +1336,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                 title={language === 'ar' ? 'السابق' : 'Previous'}
                 aria-label="Previous"
               >
-                <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-0 rtl:rotate-180 transition-transform group-hover:scale-110" />
+                <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-0 rtl:rotate-180 transition-transform group-hover:scale-105" />
               </button>
             )}
 
@@ -1357,7 +1348,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                 title={language === 'ar' ? 'التالي' : 'Next'}
                 aria-label="Next"
               >
-                <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-180 rtl:rotate-0 transition-transform group-hover:scale-110" />
+                <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 ltr:rotate-180 rtl:rotate-0 transition-transform group-hover:scale-105" />
               </button>
             )}
 
@@ -1368,12 +1359,12 @@ const Portfolio = ({ works }: { works: Work[] }) => {
               exit={{ scale: 0.9, y: -50, opacity: 0 }}
               drag
               dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-              dragElastic={0.2}
+              dragElastic={0.6}
               onDragEnd={(e, { offset, velocity }) => {
                 const swipeX = offset.x;
                 const swipeY = offset.y;
                 const isRtl = language === 'ar';
-                if (Math.abs(swipeY) > 80 || Math.abs(velocity.y) > 400) {
+                if (Math.abs(swipeY) > 50 || Math.abs(velocity.y) > 200) {
                   setSelectedIndex(null);
                 } else if (swipeX < -50 && selectedIndex !== null) {
                   if (isRtl) setSelectedIndex(selectedIndex > 0 ? selectedIndex - 1 : filteredWorks.length - 1);
@@ -1459,7 +1450,7 @@ const FAQ = () => {
 */
 
   return (
-    <SectionWrapper id="faq" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="faq" className=" py-8 md:py-16 ">
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -1473,20 +1464,24 @@ const FAQ = () => {
         }))
       })}} />
       <div className="text-center mb-16">
-        <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent-center heading-gradient truncate w-full max-w-full block">{t("nav.faq")}</h2>
-        <p className="text-black/70 dark:text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal">{t('faq.subtitle')}</p>
+        <ScrollReveal type="fade-down" distance={20}>
+          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent-center heading-gradient truncate w-full max-w-full block">{t("nav.faq")}</h2>
+        </ScrollReveal>
+        <ScrollReveal type="fade-up" delay={0.2} distance={20}>
+          <p className="text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal">{t('faq.subtitle')}</p>
+        </ScrollReveal>
       </div>
       <div className="max-w-3xl mx-auto space-y-3 px-4">
         {faqs.map((faq, i) => (
-          <ScrollReveal key={i} delay={i * 0.1}>
-          <details className="group glass-card overflow-hidden transition-all duration-500 open:bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-amber-500/30 rounded-xl">
+          <ScrollReveal key={i} delay={i * 0.1} type={i % 2 === 0 ? "fade-left" : "fade-right"} distance={20}>
+          <details className="group glass-card overflow-hidden transition-all duration-500  hover:border-amber-500/30 rounded-xl">
             <summary className="flex items-center justify-between py-3 px-4 sm:px-6 cursor-pointer list-none">
               <span className="text-sm md:text-base font-bold whitespace-nowrap overflow-hidden overflow-ellipsis rtl:ml-4 ltr:mr-4">{faq.q}</span>
-              <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center flex-shrink-0 group-open:bg-amber-500 group-open:text-black transition-all duration-500">
+              <div className="w-8 h-8 rounded-full bg-bdark:/5 flex items-center justify-center flex-shrink-0 group-open:bg-amber-500 group-open:text-black transition-all duration-500">
                 <ChevronLeft className="w-4 h-4 transition-transform duration-500 group-open:-rotate-90" />
               </div>
             </summary>
-            <div className="px-4 sm:px-6 pb-4 text-black/80 dark:text-white/60 text-xs sm:text-sm leading-relaxed font-medium border-t border-black/5 dark:border-white/5 pt-3">
+            <div className="px-4 sm:px-6 pb-4 text-white/60 text-xs sm:text-sm leading-relaxed font-medium border-t border-white/5 pt-3">
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1521,16 +1516,18 @@ const Process = () => {
 */
 
   return (
-    <SectionWrapper id="process" className="bg-gray-50 dark:bg-[#050505] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="process" className=" py-8 md:py-16 ">
       <div className="text-center mb-16 md:mb-20">
-        <ScrollReveal>
+        <ScrollReveal type="fade-down" distance={20}>
           <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("process.title")}</h2>
-          <p className="text-black/70 dark:text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium">{t('process.stepsDesc')}</p>
+        </ScrollReveal>
+        <ScrollReveal type="fade-up" delay={0.2} distance={20}>
+          <p className="text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium">{t('process.stepsDesc')}</p>
         </ScrollReveal>
       </div>
       <div className="relative max-w-5xl mx-auto px-4">
         {/* Connecting line background */}
-        <div className="absolute top-[28px] md:top-[48px] left-[10%] right-[10%] h-[2px] bg-black/5 dark:bg-white/5 z-0"></div>
+        <div className="absolute top-[28px] md:top-[48px] left-[10%] right-[10%] h-[2px] bg-bdark:/5 z-0"></div>
         {/* Animated connecting line */}
         <motion.div 
           initial={{ scaleX: 0 }}
@@ -1542,15 +1539,15 @@ const Process = () => {
         
         <div className="grid grid-cols-4 gap-2 md:gap-8 relative z-10">
           {steps.map((step, i) => (
-            <ScrollReveal key={i} delay={i * 0.3} className="flex flex-col items-center text-center group">
+            <ScrollReveal key={i} delay={i * 0.15} type="fade-up" distance={30} className="flex flex-col items-center text-center group">
               <motion.div 
                 whileHover={{ scale: 1.1 }}
-                className="w-14 h-14 md:w-24 md:h-24 rounded-full bg-white dark:bg-[#111] border-2 border-amber-500 flex items-center justify-center text-lg md:text-3xl font-black text-amber-500 transition-all duration-500 mb-4 shadow-[0_0_15px_rgba(255,138,0,0.2)] group-hover:shadow-[0_0_30px_rgba(255,138,0,0.4)] relative bg-white/90 backdrop-blur-sm"
+                className="w-14 h-14 md:w-24 md:h-24 rounded-full  border-2 border-amber-500 flex items-center justify-center text-lg md:text-3xl font-black text-amber-500 transition-all duration-500 mb-4 shadow-[0_0_15px_rgba(255,138,0,0.2)] group-hover:shadow-[0_0_30px_rgba(255,138,0,0.4)] relative bg-black/40 backdrop-blur-sm"
               >
                 {step.num}
               </motion.div>
-              <h3 className="text-xs sm:text-sm md:text-xl font-bold mb-1 md:mb-3 text-black dark:text-white leading-tight">{step.title}</h3>
-              <p className="text-[10px] sm:text-xs md:text-base text-black/80 dark:text-white/90 hidden sm:block">{step.desc}</p>
+              <h3 className="text-xs sm:text-sm md:text-xl font-bold mb-1 md:mb-3 text-white leading-tight">{step.title}</h3>
+              <p className="text-[10px] sm:text-xs md:text-base text-white/90 hidden sm:block">{step.desc}</p>
             </ScrollReveal>
           ))}
         </div>
@@ -1568,11 +1565,11 @@ const Partners = ({ partners = [] }: { partners?: Partner[] }) => {
   if (!partners || partners.length === 0) return null;
 
   return (
-    <SectionWrapper id="partners" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 overflow-hidden border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="partners" className=" py-8 md:py-16 overflow-hidden ">
       <div className="max-w-7xl mx-auto px-6 mb-12">
         <ScrollReveal>
-          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center heading-gradient mb-4 truncate w-full max-w-full block text-black dark:text-white">{t("partners.title")}</h2>
-          <p className="text-center text-black/70 dark:text-white/80">{t('partners.trustDesc')}</p>
+          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center heading-gradient mb-4 truncate w-full max-w-full block text-white">{t("partners.title")}</h2>
+          <p className="text-center text-white/80">{t('partners.trustDesc')}</p>
         </ScrollReveal>
       </div>
       <div 
@@ -1597,11 +1594,11 @@ const Partners = ({ partners = [] }: { partners?: Partner[] }) => {
             {[...partners, ...partners, ...partners].map((p, index) => (
               <div 
                 key={index} 
-                className="group/card relative mx-3 sm:mx-6 w-32 sm:w-64 h-20 sm:h-36 rounded-2xl flex items-center justify-center transition-all duration-500 cursor-pointer select-none bg-white dark:bg-[#111] shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_30px_50px_rgba(255,138,0,0.2)] hover:scale-110 hover:-translate-y-4 hover:z-50 overflow-hidden"
+                className="group/card relative mx-3 sm:mx-6 w-32 sm:w-64 h-20 sm:h-36 rounded-2xl flex items-center justify-center transition-all duration-500 cursor-pointer select-none  shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_30px_50px_rgba(255,138,0,0.2)] hover:scale-105 hover:-translate-y-2 hover:z-50 overflow-hidden"
               >
               {/* 3D Border Effects */}
               <div className="absolute inset-0 rounded-2xl border-t border-l border-white/80 dark:border-white/10 pointer-events-none transition-colors duration-500 group-hover/card:border-amber-500/30"></div>
-              <div className="absolute inset-0 rounded-2xl border-b-2 border-r-2 border-black/5 dark:border-black/40 pointer-events-none transition-colors duration-500 group-hover/card:border-amber-500/20"></div>
+              <div className="absolute inset-0 rounded-2xl border-b-2 border-r-2 border-bdark:border-black/40 pointer-events-none transition-colors duration-500 group-hover/card:border-amber-500/20"></div>
               
               {/* Background Lights for dark mode */}
               <div className="absolute inset-0 opacity-0 dark:opacity-100 pointer-events-none transition-all duration-500 overflow-hidden rounded-2xl">
@@ -1730,24 +1727,24 @@ const TestimonialCard = ({ testimonial }: { testimonial: any, key?: React.Key | 
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="glass-card p-3 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl w-full h-full relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:bg-black/5 dark:hover:bg-white/10 hover:border-amber-500/30 flex flex-col"
+      className="glass-card p-3 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl w-full h-full relative overflow-hidden transition-all duration-300 hover:scale-[1.02]  hover:border-amber-500/30 flex flex-col"
     >
       <Quote className="w-8 h-8 text-amber-500/10 absolute top-4 rtl:left-4 ltr:right-4" />
       <div className="flex gap-1 mb-3 md:mb-4 text-amber-500">
         {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
       </div>
-      <p className="text-black/80 dark:text-white/80 leading-tight sm:leading-relaxed text-[10px] sm:text-xs md:text-sm mb-4 md:mb-6 flex-1">
+      <p className="text-white/80 leading-tight sm:leading-relaxed text-[10px] sm:text-xs md:text-sm mb-4 md:mb-6 flex-1">
         <TypewriterText text={testimonial.text} isHovered={isHovered} />
       </p>
       <div className="flex items-center gap-2 sm:gap-3 mt-auto">
         <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-tr from-[#FF8A00] to-[#FFC300] p-[2px] flex-shrink-0">
-          <div className="w-full h-full bg-white dark:bg-[#111] rounded-full flex items-center justify-center font-bold text-[10px] md:text-base text-black dark:text-white">
+          <div className="w-full h-full  rounded-full flex items-center justify-center font-bold text-[10px] md:text-base text-white">
             {testimonial.name.charAt(0)}
           </div>
         </div>
         <div className="overflow-hidden">
-          <h4 className="font-bold text-black dark:text-white text-[10px] sm:text-xs md:text-sm truncate">{testimonial.name}</h4>
-          <p className="text-black/70 dark:text-white/80 text-[8px] sm:text-[10px] md:text-xs truncate">{testimonial.role}</p>
+          <h4 className="font-bold text-white text-[10px] sm:text-xs md:text-sm truncate">{testimonial.name}</h4>
+          <p className="text-white/80 text-[8px] sm:text-[10px] md:text-xs truncate">{testimonial.role}</p>
         </div>
       </div>
     </div>
@@ -1774,23 +1771,23 @@ const Testimonials = () => {
 */
 
   return (
-    <SectionWrapper id="testimonials" className="bg-gray-50 dark:bg-[#050505] py-8 md:py-16 overflow-hidden relative border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="testimonials" className=" py-8 md:py-16 overflow-hidden relative ">
       <div className="max-w-7xl mx-auto px-6 mb-16 text-center">
         <ScrollReveal>
           <AnimatedTitle text={t("testimonials.title")} className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center heading-gradient mb-4 truncate w-full max-w-full" />
-          <p className="text-black/70 dark:text-white/80 text-lg mx-auto text-center">{t('testimonials.subtitle')}</p>
+          <p className="text-white/80 text-lg mx-auto text-center">{t('testimonials.subtitle')}</p>
         </ScrollReveal>
       </div>
 
-      <div className="relative w-full overflow-hidden flex bg-transparent py-4 group" dir="ltr">
-        <div className="flex w-max animate-marquee-slow group-hover:[animation-play-state:paused] py-2">
+      <ScrollReveal type="fade-right" distance={30} delay={0.4} className="relative w-full overflow-hidden flex bg-transparent py-4 group" dir="ltr">
+        <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused] py-2">
           {[...testimonials, ...testimonials, ...testimonials].map((t, index) => (
             <div key={index} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <TestimonialCard testimonial={t} />
             </div>
           ))}
         </div>
-      </div>
+      </ScrollReveal>
     </SectionWrapper>
   );
 };
@@ -1865,31 +1862,42 @@ const Contact = () => {
     }
     setIsSubmitting(true);
     
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const message = `*طلب خدمة من الموقع*\n\n` +
-        `*الاسم:* ${formData.name}\n` +
-        (formData.email ? `*البريد الإلكتروني:* ${formData.email}\n` : '') +
-        `*رقم الجوال:* ${formData.phone}\n` +
-        `*نوع العميل:* ${formData.clientType}\n` +
-        `*الخدمة المطلوبة:* ${formData.serviceRequested}\n` +
-        `*الرسالة أو التفاصيل:* ${formData.details}`;
+    const message = `*طلب خدمة من الموقع*\n\n` +
+      `*الاسم:* ${formData.name}\n` +
+      (formData.email ? `*البريد الإلكتروني:* ${formData.email}\n` : '') +
+      `*رقم الجوال:* ${formData.phone}\n` +
+      `*نوع العميل:* ${formData.clientType}\n` +
+      `*الخدمة المطلوبة:* ${formData.serviceRequested}\n` +
+      `*الرسالة أو التفاصيل:* ${formData.details}`;
+    const waUrl = `https://wa.me/966536753679?text=${encodeURIComponent(message)}`;
 
-      const waUrl = `https://wa.me/966536753679?text=${encodeURIComponent(message)}`;
+    const onComplete = () => {
       window.open(waUrl, '_blank');
-      
+      setIsSubmitting(false);
       setFormData({ name: '', email: '', phone: '05', clientType: 'أفراد', serviceRequested: 'تصوير فيديو', details: '' });
       localStorage.removeItem('contactFormDraft');
-    }, 500);
+    };
+
+    // Add Google Analytics Conversion Event with delayed navigation fallback
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'conversion_event_contact', {
+        'event_callback': onComplete,
+        'event_timeout': 2000
+      });
+      // Fallback timeout in case gtag fails silently to fire the callback
+      setTimeout(() => setIsSubmitting(false), 2500);
+    } else {
+      setTimeout(onComplete, 500);
+    }
   };
 
   return (
-    <SectionWrapper id="contact" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-16 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="contact" className=" py-8 md:py-16 ">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <ScrollReveal>
+          <ScrollReveal type="fade-right" distance={30}>
             <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent heading-gradient truncate w-full max-w-full block">{t("contact.title")}</h2>
-            <p className="text-black/80 dark:text-white/90 mb-12 text-base md:text-lg">{t('contact.formDesc')}</p>
+            <p className="text-white/90 mb-12 text-base md:text-lg">{t('contact.formDesc')}</p>
             
             <div className="space-y-8">
               <div className="flex items-start gap-4">
@@ -1897,8 +1905,8 @@ const Contact = () => {
                   <Phone className="w-6 h-6 text-amber-500" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-black dark:text-white mb-1">{t('contact.phone')}</h4>
-                  <p className="text-black/80 dark:text-white/90" dir="ltr">053 675 3679</p>
+                  <h4 className="font-bold text-white mb-1">{t('contact.phone')}</h4>
+                  <p className="text-white/90" dir="ltr">053 675 3679</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -1906,8 +1914,8 @@ const Contact = () => {
                   <Mail className="w-6 h-6 text-amber-500" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-black dark:text-white mb-1">{t("quote.email")}</h4>
-                  <p className="text-black/80 dark:text-white/90">Hello@eventliveksa.com</p>
+                  <h4 className="font-bold text-white mb-1">{t("quote.email")}</h4>
+                  <p className="text-white/90">Hello@eventliveksa.com</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -1915,46 +1923,46 @@ const Contact = () => {
                   <MapPin className="w-6 h-6 text-amber-500" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-black dark:text-white mb-1">{t('contact.location')}</h4>
-                  <p className="text-black/80 dark:text-white/90">{t('contact.locationDesc')}</p>
+                  <h4 className="font-bold text-white mb-1">{t('contact.location')}</h4>
+                  <p className="text-white/90">{t('contact.locationDesc')}</p>
                 </div>
               </div>
             </div>
           </ScrollReveal>
           
-          <ScrollReveal delay={0.2}>
+          <ScrollReveal type="fade-left" delay={0.2} distance={30}>
             <form onSubmit={handleSubmit} className="glass-card p-8 rounded-3xl space-y-6 relative overflow-hidden group/form">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-black/80 dark:text-white/80 mb-2">{t('contact.nameLabel')}</label>
-                  <input name="name" dir="auto" placeholder={t("contact.namePlaceholder")} value={formData.name} onChange={handleChange} className={`w-full bg-black/5 dark:bg-white/5 border ${errors.name ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white focus:bg-white dark:focus:bg-black/40 shadow-sm`} />
+                  <label className="block text-sm font-bold text-white/80 mb-2">{t('contact.nameLabel')}</label>
+                  <input name="name" dir="auto" placeholder={t("contact.namePlaceholder")} value={formData.name} onChange={handleChange} className={`w-full bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white focus:bg-white/10 shadow-sm`} />
                   {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-black/80 dark:text-white/80 mb-2">{t('contact.emailLabel')}</label>
-                  <input name="email" placeholder="example@domain.com" value={formData.email} onChange={handleChange} type="email" className={`w-full bg-black/5 dark:bg-white/5 border ${errors.email ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white focus:bg-white dark:focus:bg-black/40 shadow-sm text-start`} dir="auto" />
+                  <label className="block text-sm font-bold text-white/80 mb-2">{t('contact.emailLabel')}</label>
+                  <input name="email" placeholder="example@domain.com" value={formData.email} onChange={handleChange} type="email" className={`w-full bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white focus:bg-white/10 shadow-sm text-start`} dir="auto" />
                   {errors.email && <p className="text-red-500 text-xs mt-1 text-start">{errors.email}</p>}
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-bold text-black/80 dark:text-white/80 mb-2">{t('contact.phoneLabel')}</label>
-                <input name="phone" placeholder="05XXXXXXXX" value={formData.phone} onChange={handleChange} type="tel" className={`w-full bg-black/5 dark:bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white focus:bg-white dark:focus:bg-black/40 shadow-sm text-start`} dir="auto" />
+                <label className="block text-sm font-bold text-white/80 mb-2">{t('contact.phoneLabel')}</label>
+                <input name="phone" placeholder="05XXXXXXXX" value={formData.phone} onChange={handleChange} type="tel" className={`w-full bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white focus:bg-white/10 shadow-sm text-start`} dir="auto" />
                 {errors.phone && <p className="text-red-500 text-xs mt-1 text-start">{errors.phone}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-black/80 dark:text-white/80 mb-2">{t("quote.clientType")}</label>
-                  <select name="clientType" value={formData.clientType} onChange={handleChange} className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white focus:bg-white dark:focus:bg-black/40 shadow-sm appearance-none">
+                  <label className="block text-sm font-bold text-white/80 mb-2">{t("quote.clientType")}</label>
+                  <select name="clientType" value={formData.clientType} onChange={handleChange} className="w-full bg-bdark:/5 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white focus: dark:focus:bg-black/40 shadow-sm appearance-none">
                     <option value={t("contact.clientIndividuals")} className="text-black">{t('contact.clientIndividuals')}</option>
                     <option value={t("contact.clientCompanies")} className="text-black">{t('contact.clientCompanies')}</option>
                     <option value={t("contact.clientGov")} className="text-black">{t('contact.clientGov')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-black/80 dark:text-white/80 mb-2">{t('contact.serviceLabel')}</label>
-                  <select name="serviceRequested" value={formData.serviceRequested} onChange={handleChange} className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white focus:bg-white dark:focus:bg-black/40 shadow-sm appearance-none">
+                  <label className="block text-sm font-bold text-white/80 mb-2">{t('contact.serviceLabel')}</label>
+                  <select name="serviceRequested" value={formData.serviceRequested} onChange={handleChange} className="w-full bg-bdark:/5 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white focus: dark:focus:bg-black/40 shadow-sm appearance-none">
                     <option value={t("contact.serviceVideo")} className="text-black">{t('contact.serviceVideo')}</option>
                     <option value={t("contact.servicePhoto")} className="text-black">{t('contact.servicePhoto')}</option>
                     <option value={t("contact.serviceLive")} className="text-black">{t('contact.serviceLive')}</option>
@@ -1965,14 +1973,14 @@ const Contact = () => {
               </div>
 
               <div className="relative">
-                <label className="block text-sm font-bold text-black/80 dark:text-white/80 mb-2 flex items-center justify-between">
+                <label className="block text-sm font-bold text-white/80 mb-2 flex items-center justify-between">
                   <span>{t('contact.detailsLabel')}</span>
-                  <button type="button" onClick={startListening} className={`text-xs flex items-center gap-1 px-2 py-1 rounded-md transition-colors ${isListening ? 'bg-red-500/20 text-red-500 animate-pulse' : 'bg-black/5 dark:bg-white/10 text-black/80 dark:text-white/90 hover:text-amber-500'}`} title={t("contact.dictationHint")}>
+                  <button type="button" onClick={startListening} className={`text-xs flex items-center gap-1 px-2 py-1 rounded-md transition-colors ${isListening ? 'bg-red-500/20 text-red-500 animate-pulse' : 'bg-white/5 text-white/90 hover:text-amber-500'}`} title={t("contact.dictationHint")}>
                     <Mic className="w-3 h-3" />
                     {isListening ? t("contact.dictationListening") : t("contact.dictationBtn")}
                   </button>
                 </label>
-                <textarea dir="auto" name="details" placeholder={t("contact.detailsPlaceholder")} value={formData.details} onChange={handleChange} rows={4} className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors resize-none text-black dark:text-white focus:bg-white dark:focus:bg-black/40 shadow-sm"></textarea>
+                <textarea dir="auto" name="details" placeholder={t("contact.detailsPlaceholder")} value={formData.details} onChange={handleChange} rows={4} className="w-full bg-bdark:/5 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors resize-none text-white focus: dark:focus:bg-black/40 shadow-sm"></textarea>
               </div>
 
               <button disabled={isSubmitting} type="submit" className="w-full py-4 bg-amber-500 text-black font-bold text-lg rounded-xl hover:bg-amber-400 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(255,138,0,0.3)]">
@@ -1999,7 +2007,7 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
   };
   
   return (
-    <footer className="relative bg-white/50 dark:bg-[#020202]/80 backdrop-blur-3xl border-t border-black/5 dark:border-white/5 pt-12 md:pt-20 pb-10 overflow-hidden">
+    <footer className="relative bg-[#0a0c0d]/80 backdrop-blur-3xl border-t pt-12 md:pt-20 pb-10 overflow-hidden">
       {/* Dynamic Backgrounds */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 -left-1/4 w-1/2 h-full bg-amber-500/20 blur-[120px] rounded-full mix-blend-screen animate-bg-pan" style={{ animationDuration: '15s' }}></div>
@@ -2013,17 +2021,17 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
             <a href="#home" className="flex items-center gap-2 mb-6">
               <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-12 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
             </a>
-            <p className="text-black/80 dark:text-white/90 mb-6 leading-relaxed">
+            <p className="text-white/90 mb-6 leading-relaxed">
               {t("footer.companyDesc")}
             </p>
           </div>
           
-          <div className="border-b border-black/10 dark:border-white/10 md:border-none pb-4 md:pb-0">
+          <div className="border-b border-white/10 md:border-none pb-4 md:pb-0">
             <button 
               onClick={() => toggleSection('quickLinks')}
               className="flex justify-between items-center w-full md:cursor-auto"
             >
-              <h4 className="font-bold text-lg text-black dark:text-white md:mb-6">{t("footer.quickLinks")}</h4>
+              <h4 className="font-bold text-lg text-white md:mb-6">{t("footer.quickLinks")}</h4>
               <ChevronDown className={`w-5 h-5 md:hidden transition-transform duration-300 ${openSection === 'quickLinks' ? 'rotate-180' : ''}`} />
             </button>
             <div className={`mt-4 md:mt-0 overflow-hidden transition-all duration-300 ${openSection === 'quickLinks' ? 'max-h-96' : 'max-h-0 md:max-h-full'}`}>
@@ -2036,12 +2044,12 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
             </div>
           </div>
           
-          <div className="border-b border-black/10 dark:border-white/10 md:border-none pb-4 md:pb-0">
+          <div className="border-b border-white/10 md:border-none pb-4 md:pb-0">
             <button 
               onClick={() => toggleSection('services')}
               className="flex justify-between items-center w-full md:cursor-auto"
             >
-              <h4 className="font-bold text-lg text-black dark:text-white md:mb-6">{t("nav.services")}</h4>
+              <h4 className="font-bold text-lg text-white md:mb-6">{t("nav.services")}</h4>
               <ChevronDown className={`w-5 h-5 md:hidden transition-transform duration-300 ${openSection === 'services' ? 'rotate-180' : ''}`} />
             </button>
             <div className={`mt-4 md:mt-0 overflow-hidden transition-all duration-300 ${openSection === 'services' ? 'max-h-96' : 'max-h-0 md:max-h-full'}`}>
@@ -2059,20 +2067,20 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
               onClick={() => toggleSection('contact')}
               className="flex justify-between items-center w-full md:cursor-auto"
             >
-              <h4 className="font-bold text-lg text-black dark:text-white md:mb-6">{t("contact.title")}</h4>
+              <h4 className="font-bold text-lg text-white md:mb-6">{t("contact.title")}</h4>
               <ChevronDown className={`w-5 h-5 md:hidden transition-transform duration-300 ${openSection === 'contact' ? 'rotate-180' : ''}`} />
             </button>
             
             <div className={`mt-4 md:mt-0 overflow-hidden transition-all duration-300 ${openSection === 'contact' ? 'max-h-96' : 'max-h-0 md:max-h-full'}`}>
               <div className="flex flex-col gap-4 mb-6">
-                <a href="tel:0536753679" className="flex items-center gap-3 text-black/80 dark:text-white/90 hover:text-amber-500 transition-colors relative z-10 pointer-events-auto">
-                  <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-amber-500">
+                <a href="tel:0536753679" className="flex items-center gap-3 text-white/90 hover:text-amber-500 transition-colors relative z-10 pointer-events-auto">
+                  <div className="w-8 h-8 rounded-full bg-bdark:/5 flex items-center justify-center text-amber-500">
                     <Phone className="w-4 h-4" />
                   </div>
                   <span className="font-medium text-sm" dir="ltr">0536753679</span>
                 </a>
-                <a href="mailto:Hello@eventliveksa.com" className="flex items-center gap-3 text-black/80 dark:text-white/90 hover:text-amber-500 transition-colors relative z-10 pointer-events-auto">
-                  <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-amber-500">
+                <a href="mailto:Hello@eventliveksa.com" className="flex items-center gap-3 text-white/90 hover:text-amber-500 transition-colors relative z-10 pointer-events-auto">
+                  <div className="w-8 h-8 rounded-full bg-bdark:/5 flex items-center justify-center text-amber-500">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="font-medium text-sm" dir="ltr">Hello@eventliveksa.com</span>
@@ -2093,11 +2101,11 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
                   website: Globe
                 };
                 const ColorMapLocal: Record<string, string> = {
-                  twitter: 'bg-black text-white dark:bg-white dark:text-black hover:opacity-80',
+                  twitter: 'bg-black text-white  hover:opacity-80',
                   instagram: 'bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white hover:opacity-80',
                   linkedin: 'bg-[#0077b5] text-white hover:opacity-80',
                   snapchat: 'bg-[#FFFC00] text-black hover:opacity-80',
-                  tiktok: 'bg-black text-white dark:bg-white dark:text-black hover:opacity-80',
+                  tiktok: 'bg-black text-white  hover:opacity-80',
                 };
                 const Icon = IconMapLocal[link.platform] || Globe;
                 const colorClass = ColorMapLocal[link.platform] || 'bg-amber-500 text-black hover:opacity-80';
@@ -2112,14 +2120,14 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
             </div>
           </div>
         </div>
-        <div className="border-t border-black/5 dark:border-white/5 pt-8 flex flex-col items-center gap-4 text-sm text-black/40 dark:text-white/40">
+        <div className="border-t border-white/5 pt-8 flex flex-col items-center gap-4 text-sm text-white/40">
           <div className="flex flex-col md:flex-row w-full items-center justify-between gap-4">
             <p>© {new Date().getFullYear()} EventLive KSA. {t("footer.rights")}</p>
             <div className="flex gap-4 items-center">
               <a href="https://eventliveksa.com" target="_blank" rel="noopener noreferrer" className="hover:text-amber-500 transition-colors">eventliveksa.com</a>
-              <span className="text-black/20 dark:text-white/20">|</span>
+              <span className="text-white/20">|</span>
               <button onClick={(e) => { e.preventDefault(); setIsTermsOpen(true); }} className="hover:text-amber-500 transition-colors">{t("footer.terms")}</button>
-              <span className="text-black/20 dark:text-white/20">|</span>
+              <span className="text-white/20">|</span>
               <button onClick={(e) => { e.preventDefault(); setIsPrivacyOpen(true); }} className="hover:text-amber-500 transition-colors">{t("footer.privacy")}</button>
             </div>
             
@@ -2127,12 +2135,12 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
               {isTermsOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsTermsOpen(false)} />
-                  <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-white dark:bg-[#111] rounded-2xl shadow-2xl p-6 sm:p-10 border border-black/10 dark:border-white/10 text-right md:text-right ltr:text-left">
-                    <button onClick={() => setIsTermsOpen(false)} className="absolute top-4 rtl:left-4 ltr:right-4 rtl:right-auto text-black/70 dark:text-white/80 hover:text-amber-500 transition-colors bg-black/5 dark:bg-white/5 p-2 rounded-full">
+                  <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto  rounded-2xl shadow-2xl p-6 sm:p-10 border-white/10 text-right md:text-right ltr:text-left">
+                    <button onClick={() => setIsTermsOpen(false)} className="absolute top-4 rtl:left-4 ltr:right-4 rtl:right-auto text-white/80 hover:text-amber-500 transition-colors bg-bdark:/5 p-2 rounded-full">
                       <X className="w-5 h-5" />
                     </button>
-                    <h2 className="text-2xl font-bold mb-6 text-black dark:text-white">{t("footer.terms")}</h2>
-                    <div className="space-y-4 text-black/70 dark:text-white/70 text-sm md:text-base leading-relaxed">
+                    <h2 className="text-2xl font-bold mb-6 text-white">{t("footer.terms")}</h2>
+                    <div className="space-y-4 text-white/70 text-sm md:text-base leading-relaxed">
                       <p><strong>1. قبول الشروط:</strong> باستخدامك لخدمات EventLive KSA، فإنك توافق على الالتزام بهذه الشروط والأحكام.</p>
                       <p><strong>2. الخدمات:</strong> نقدم خدمات التصوير الفوتوغرافي والفيديو والبث المباشر للفعاليات والمؤتمرات وفقاً لما يتم الاتفاق عليه في عقد الخدمة.</p>
                       <p><strong>3. الدفع والتسعير:</strong> يتم تحديد الأسعار بناءً على متطلبات كل فعالية. يتم دفع عربون لتأكيد الحجز والمبلغ المتبقي قبل تسليم المواد النهائية.</p>
@@ -2146,12 +2154,12 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
               {isPrivacyOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsPrivacyOpen(false)} />
-                  <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-white dark:bg-[#111] rounded-2xl shadow-2xl p-6 sm:p-10 border border-black/10 dark:border-white/10 text-right md:text-right ltr:text-left">
-                    <button onClick={() => setIsPrivacyOpen(false)} className="absolute top-4 rtl:left-4 ltr:right-4 rtl:right-auto text-black/70 dark:text-white/80 hover:text-amber-500 transition-colors bg-black/5 dark:bg-white/5 p-2 rounded-full">
+                  <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto  rounded-2xl shadow-2xl p-6 sm:p-10 border-white/10 text-right md:text-right ltr:text-left">
+                    <button onClick={() => setIsPrivacyOpen(false)} className="absolute top-4 rtl:left-4 ltr:right-4 rtl:right-auto text-white/80 hover:text-amber-500 transition-colors bg-bdark:/5 p-2 rounded-full">
                       <X className="w-5 h-5" />
                     </button>
-                    <h2 className="text-2xl font-bold mb-6 text-black dark:text-white">{t("footer.privacy")}</h2>
-                    <div className="space-y-4 text-black/70 dark:text-white/70 text-sm md:text-base leading-relaxed">
+                    <h2 className="text-2xl font-bold mb-6 text-white">{t("footer.privacy")}</h2>
+                    <div className="space-y-4 text-white/70 text-sm md:text-base leading-relaxed">
                       <p><strong>1. جمع المعلومات:</strong> نقوم بجمع المعلومات الشخصية التي تقدمها لنا طواعية عند التواصل معنا أو طلب خدماتنا، مثل الاسم، رقم الهاتف، وعنوان البريد الإلكتروني.</p>
                       <p><strong>2. استخدام المعلومات:</strong> نستخدم معلوماتك لتوفير الخدمات المطلوبة، التواصل معك بخصوص حجوزاتك، وتحسين مستوى خدمتنا.</p>
                       <p><strong>3. حماية المعلومات:</strong> نحن نتخذ إجراءات أمنية مناسبة لحماية معلوماتك الشخصية من الوصول غير المصرح به أو التعديل أو الكشف عنها.</p>
@@ -2164,8 +2172,8 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
               )}
             </AnimatePresence>
           </div>
-          <div className="mt-4 pb-4 w-full flex justify-center border-t border-black/5 dark:border-white/5 pt-6">
-             <p className="text-xs text-black/40 dark:text-white/40 flex items-center gap-1">
+          <div className="mt-4 pb-4 w-full flex justify-center border-t border-white/5 pt-6">
+             <p className="text-xs text-white/40 flex items-center gap-1">
                 Powered by <a href="https://www.nmolabs.com" target="_blank" rel="noopener noreferrer" className="font-bold hover:text-amber-500 transition-colors">NmoLabs</a>
              </p>
           </div>
@@ -2224,19 +2232,19 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
 
   return (
     <div className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white dark:bg-[#111] rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl overflow-hidden border border-black/10 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
-        <div className="p-6 border-b border-black/10 dark:border-white/10 flex items-center justify-between bg-gray-50 dark:bg-[#0a0a0a]">
-          <h2 className="text-2xl font-bold flex items-center gap-2 text-black dark:text-white"><Settings className="w-6 h-6" /> لوحة التحكم</h2>
+      <div className="  rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl overflow-hidden border-white/10" onClick={(e) => e.stopPropagation()}>
+        <div className="p-6 lack/10 dark:border-white/10 flex items-center justify-between ">
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-white"><Settings className="w-6 h-6" /> لوحة التحكم</h2>
           <div className="flex gap-4">
             <button onClick={() => onSave(localData)} className="px-6 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">حفظ التغييرات</button>
-            <button onClick={onClose} className="p-2 text-black/70 dark:text-white/80 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/5 rounded-lg"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-2 text-white/80 hover:text-black dark:hover:text-white bg-bdark:/5 rounded-lg"><X className="w-5 h-5" /></button>
           </div>
         </div>
         
         <div className="flex flex-1 overflow-hidden">
-          <div className="w-64 bg-gray-50 dark:bg-[#0a0a0a] border-l border-black/10 dark:border-white/10 p-4 flex flex-col gap-2 overflow-y-auto">
+          <div className="w-64 border-l lack/10 dark:border-white/10 p-4 flex flex-col gap-2 overflow-y-auto">
             {['services', 'portfolio', 'social', 'hero', 'partners'].map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)} className={`text-start px-4 py-3 rounded-lg font-bold transition-colors ${activeTab === tab ? 'bg-amber-500 text-black' : 'text-black/80 dark:text-white/90 hover:bg-black/5 dark:hover:bg-white/5'}`}>
+              <button key={tab} onClick={() => setActiveTab(tab)} className={`text-start px-4 py-3 rounded-lg font-bold transition-colors ${activeTab === tab ? 'bg-amber-500 text-black' : 'text-white/90 hover:bg-bdark:hover:bg-white/5'}`}>
                 {tab === 'services' && 'الخدمات'}
                 {tab === 'portfolio' && 'الأعمال'}
                 {tab === 'social' && 'التواصل الاجتماعي'}
@@ -2246,13 +2254,13 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
             ))}
           </div>
           
-          <div className="flex-1 p-6 overflow-y-auto bg-white dark:bg-[#111]">
+          <div className="flex-1 p-6 overflow-y-auto ">
             {activeTab === 'hero' && (
               <div className="space-y-6">
-                <h3 className="text-xl font-bold mb-4 text-black dark:text-white">إعدادات القسم الرئيسي</h3>
+                <h3 className="text-xl font-bold mb-4 text-white">إعدادات القسم الرئيسي</h3>
                 <div>
-                  <label className="block text-sm font-bold mb-2 text-black/80 dark:text-white/80">رابط فيديو الخلفية (YouTube أو رابط مباشر MP4/WebM)</label>
-                  <input type="text" value={localData.heroVideoUrl || ''} onChange={(e) => setLocalData({...localData, heroVideoUrl: e.target.value})} className="w-full bg-black/5 dark:bg-[#222] border border-black/10 dark:border-white/10 rounded-lg px-4 py-3" dir="ltr" placeholder="https://..." />
+                  <label className="block text-sm font-bold mb-2 text-white/80">رابط فيديو الخلفية (YouTube أو رابط مباشر MP4/WebM)</label>
+                  <input type="text" value={localData.heroVideoUrl || ''} onChange={(e) => setLocalData({...localData, heroVideoUrl: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3" dir="ltr" placeholder="https://..." />
                 </div>
               </div>
             )}
@@ -2260,18 +2268,18 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
             {activeTab === 'services' && (
               <div className="space-y-8">
                 {localData.services.map(service => (
-                  <div key={service.id} className="p-6 bg-gray-50 dark:bg-[#222] rounded-xl border border-black/5 dark:border-white/5 space-y-4">
-                    <input dir="auto" type="text" value={service.title} onChange={(e) => setLocalData({...localData, services: localData.services.map(s => s.id === service.id ? {...s, title: e.target.value} : s)})} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-4 py-2 font-bold text-lg" />
-                    <textarea dir="auto" value={service.desc} onChange={(e) => setLocalData({...localData, services: localData.services.map(s => s.id === service.id ? {...s, desc: e.target.value} : s)})} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-4 py-2 text-sm" rows={2} />
-                    <input type="text" value={service.cardBgImage || ''} onChange={(e) => setLocalData({...localData, services: localData.services.map(s => s.id === service.id ? {...s, cardBgImage: e.target.value} : s)})} placeholder="رابط صورة خلفية البطاقة كاملة (اختياري)" className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-4 py-2 text-sm" dir="ltr" />
+                  <div key={service.id} className="p-6  rounded-xl border space-y-4">
+                    <input dir="auto" type="text" value={service.title} onChange={(e) => setLocalData({...localData, services: localData.services.map(s => s.id === service.id ? {...s, title: e.target.value} : s)})} className="w-full  border-white/10 rounded-lg px-4 py-2 font-bold text-lg" />
+                    <textarea dir="auto" value={service.desc} onChange={(e) => setLocalData({...localData, services: localData.services.map(s => s.id === service.id ? {...s, desc: e.target.value} : s)})} className="w-full  border-white/10 rounded-lg px-4 py-2 text-sm" rows={2} />
+                    <input type="text" value={service.cardBgImage || ''} onChange={(e) => setLocalData({...localData, services: localData.services.map(s => s.id === service.id ? {...s, cardBgImage: e.target.value} : s)})} placeholder="رابط صورة خلفية البطاقة كاملة (اختياري)" className="w-full  border-white/10 rounded-lg px-4 py-2 text-sm" dir="ltr" />
                     <div className="flex gap-4">
-                      <select value={service.mediaType || 'icon'} onChange={(e) => handleUpdateServiceMedia(service.id, e.target.value as any, service.mediaValue || '')} className="bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-4 py-2 text-sm">
+                      <select value={service.mediaType || 'icon'} onChange={(e) => handleUpdateServiceMedia(service.id, e.target.value as any, service.mediaValue || '')} className="  border-white/10 rounded-lg px-4 py-2 text-sm">
                         <option value="icon">أيقونة</option>
                         <option value="image">صورة</option>
                         <option value="video">فيديو</option>
                       </select>
                       {service.mediaType !== 'icon' && (
-                        <input type="text" value={service.mediaValue || ''} onChange={(e) => handleUpdateServiceMedia(service.id, service.mediaType as any, e.target.value)} placeholder={service.mediaType === 'image' ? 'رابط الصورة' : 'رابط الفيديو (يوتيوب أو مباشر)'} className="flex-1 bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-4 py-2 text-sm" dir="ltr" />
+                        <input type="text" value={service.mediaValue || ''} onChange={(e) => handleUpdateServiceMedia(service.id, service.mediaType as any, e.target.value)} placeholder={service.mediaType === 'image' ? 'رابط الصورة' : 'رابط الفيديو (يوتيوب أو مباشر)'} className="flex-1  border-white/10 rounded-lg px-4 py-2 text-sm" dir="ltr" />
                       )}
                     </div>
                   </div>
@@ -2286,14 +2294,14 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
                 </button>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {localData.works.map(work => (
-                    <div key={work.id} className="p-4 bg-gray-50 dark:bg-[#222] rounded-xl border border-black/5 dark:border-white/5 relative group">
+                    <div key={work.id} className="p-4  rounded-xl border relative group">
                       <button onClick={() => handleRemoveWork(work.id)} className="absolute top-2 rtl:left-2 ltr:right-2 p-2 bg-red-500/10 text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                         <Trash2 className="w-4 h-4" />
                       </button>
-                      <input dir="auto" type="text" value={work.title} onChange={(e) => handleUpdateWork(work.id, 'title', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 mb-2 font-bold" />
-                      <input type="text" value={work.img} onChange={(e) => handleUpdateWork(work.id, 'img', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm mb-2" placeholder="رابط الصورة" dir="ltr" />
-                      <input type="text" value={work.videoUrl || ''} onChange={(e) => handleUpdateWork(work.id, 'videoUrl', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm" placeholder="رابط الفيديو (يوتيوب)" dir="ltr" />
-                      <input dir="auto" type="text" value={work.category || ''} onChange={(e) => handleUpdateWork(work.id, 'category', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm mt-2" placeholder="التصنيف (مثال: تصوير)" />
+                      <input dir="auto" type="text" value={work.title} onChange={(e) => handleUpdateWork(work.id, 'title', e.target.value)} className="w-full  border-white/10 rounded-lg px-3 py-2 mb-2 font-bold" />
+                      <input type="text" value={work.img} onChange={(e) => handleUpdateWork(work.id, 'img', e.target.value)} className="w-full  border-white/10 rounded-lg px-3 py-2 text-sm mb-2" placeholder="رابط الصورة" dir="ltr" />
+                      <input type="text" value={work.videoUrl || ''} onChange={(e) => handleUpdateWork(work.id, 'videoUrl', e.target.value)} className="w-full  border-white/10 rounded-lg px-3 py-2 text-sm" placeholder="رابط الفيديو (يوتيوب)" dir="ltr" />
+                      <input dir="auto" type="text" value={work.category || ''} onChange={(e) => handleUpdateWork(work.id, 'category', e.target.value)} className="w-full  border-white/10 rounded-lg px-3 py-2 text-sm mt-2" placeholder="التصنيف (مثال: تصوير)" />
                     </div>
                   ))}
                 </div>
@@ -2303,9 +2311,9 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
             {activeTab === 'social' && (
               <div className="space-y-4">
                 {localData.socialLinks.map(link => (
-                  <div key={link.platform} className="flex items-center gap-4 bg-gray-50 dark:bg-[#222] p-4 rounded-xl border border-black/5 dark:border-white/5">
-                    <div className="w-24 capitalize font-bold text-black/70 dark:text-white/80">{link.platform}</div>
-                    <input type="text" value={link.url} onChange={(e) => handleUpdateSocial(link.platform, e.target.value)} className="flex-1 bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-4 py-2" dir="ltr" placeholder="https://..." />
+                  <div key={link.platform} className="flex items-center gap-4  p-4 rounded-xl border ">
+                    <div className="w-24 capitalize font-bold text-white/80">{link.platform}</div>
+                    <input type="text" value={link.url} onChange={(e) => handleUpdateSocial(link.platform, e.target.value)} className="flex-1  border-white/10 rounded-lg px-4 py-2" dir="ltr" placeholder="https://..." />
                   </div>
                 ))}
               </div>
@@ -2318,16 +2326,16 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
                 </button>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {(localData.partners || []).map(partner => (
-                    <div key={partner.id} className="p-4 bg-gray-50 dark:bg-[#222] rounded-xl border border-black/5 dark:border-white/5 relative">
+                    <div key={partner.id} className="p-4  rounded-xl border relative">
                       <button onClick={() => setLocalData({...localData, partners: localData.partners?.filter(p => p.id !== partner.id)})} className="absolute top-4 rtl:left-4 ltr:right-4 p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20"><X className="w-4 h-4" /></button>
                       <div className="space-y-4 pt-8">
                         <div>
                           <label className="block text-xs font-bold mb-1 opacity-50">اسم الشريك</label>
-                          <input dir="auto" type="text" value={partner.name} onChange={(e) => setLocalData({...localData, partners: localData.partners?.map(p => p.id === partner.id ? {...p, name: e.target.value} : p)})} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm" />
+                          <input dir="auto" type="text" value={partner.name} onChange={(e) => setLocalData({...localData, partners: localData.partners?.map(p => p.id === partner.id ? {...p, name: e.target.value} : p)})} className="w-full  border-white/10 rounded-lg px-3 py-2 text-sm" />
                         </div>
                         <div>
                           <label className="block text-xs font-bold mb-1 opacity-50">رابط الشعار (صورة)</label>
-                          <input type="text" value={partner.logo} onChange={(e) => setLocalData({...localData, partners: localData.partners?.map(p => p.id === partner.id ? {...p, logo: e.target.value} : p)})} className="w-full bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm" dir="ltr" />
+                          <input type="text" value={partner.logo} onChange={(e) => setLocalData({...localData, partners: localData.partners?.map(p => p.id === partner.id ? {...p, logo: e.target.value} : p)})} className="w-full  border-white/10 rounded-lg px-3 py-2 text-sm" dir="ltr" />
                         </div>
                       </div>
                     </div>
@@ -2474,10 +2482,23 @@ const QuoteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void 
     }
 
     const message = `*${t("quote.title")} جديد*\nالاسم: ${formData.name}\nالبريد: ${formData.email}\nالهاتف: ${formData.phone}\nنوع العميل: ${formData.clientType}\nنوع الفعالية: ${formData.eventType}\nملاحظات: ${formData.notes}`;
-
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/966536753679?text=${encodedMessage}`, '_blank');
-    onClose();
+    const waUrl = `https://wa.me/966536753679?text=${encodedMessage}`;
+
+    const onComplete = () => {
+      window.open(waUrl, '_blank');
+      onClose();
+    };
+
+    // Add Google Analytics Conversion Event with delayed navigation fallback
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'conversion_event_contact', {
+        'event_callback': onComplete,
+        'event_timeout': 2000
+      });
+    } else {
+      onComplete();
+    }
   };
 
   const clientTypes = [{id: 'gov', name: t('client.gov')}, {id: 'company', name: t('client.company')}, {id: 'org', name: t('client.org')}, {id: 'individual', name: t('client.individual')}];
@@ -2489,52 +2510,52 @@ const QuoteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void 
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 50, scale: 0.9 }}
-        className="bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-2xl p-8 w-full max-w-xl shadow-2xl relative overflow-y-auto max-h-[90vh]"
+        className="  border-white/10 rounded-2xl p-8 w-full max-w-xl shadow-2xl relative overflow-y-auto max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-6 rtl:left-6 ltr:right-6 text-black/70 dark:text-white/80 hover:text-amber-500 transition-colors bg-black/5 dark:bg-white/5 p-2 rounded-full">
+        <button onClick={onClose} className="absolute top-6 rtl:left-6 ltr:right-6 text-white/80 hover:text-amber-500 transition-colors bg-bdark:/5 p-2 rounded-full">
           <X className="w-5 h-5" />
         </button>
-        <h2 className="text-3xl font-black mb-2 text-black dark:text-white">{t("quote.title")}</h2>
-        <p className="text-black/80 dark:text-white/90 mb-8">{t("quote.subtitle")}</p>
+        <h2 className="text-3xl font-black mb-2 text-white">{t("quote.title")}</h2>
+        <p className="text-white/90 mb-8">{t("quote.subtitle")}</p>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-bold mb-2 text-black/80 dark:text-white/80">{t("quote.name")}</label>
-              <input name="name" dir="auto" value={formData.name} onChange={handleChange} type="text" className={`w-full bg-black/5 dark:bg-white/5 border ${errors.name ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white`} />
+              <label className="block text-sm font-bold mb-2 text-white/80">{t("quote.name")}</label>
+              <input name="name" dir="auto" value={formData.name} onChange={handleChange} type="text" className={`w-full bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white`} />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold mb-2 text-black/80 dark:text-white/80">{t("quote.email")}</label>
-              <input name="email" value={formData.email} onChange={handleChange} type="email" className={`w-full bg-black/5 dark:bg-white/5 border ${errors.email ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white`} dir="ltr" />
+              <label className="block text-sm font-bold mb-2 text-white/80">{t("quote.email")}</label>
+              <input name="email" value={formData.email} onChange={handleChange} type="email" className={`w-full bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white`} dir="ltr" />
               {errors.email && <p className="text-red-500 text-xs mt-1 text-start">{errors.email}</p>}
             </div>
           </div>
           <div>
-            <label className="block text-sm font-bold mb-2 text-black/80 dark:text-white/80">{t("quote.phone")}</label>
-            <input name="phone" value={formData.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" className={`w-full bg-black/5 dark:bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white`} dir="ltr" />
+            <label className="block text-sm font-bold mb-2 text-white/80">{t("quote.phone")}</label>
+            <input name="phone" value={formData.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" className={`w-full bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white`} dir="ltr" />
             {errors.phone && <p className="text-red-500 text-xs mt-1 text-start">{errors.phone}</p>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-bold mb-2 text-black/80 dark:text-white/80">{t("quote.clientType")}</label>
+              <label className="block text-sm font-bold mb-2 text-white/80">{t("quote.clientType")}</label>
               <div className="relative">
-                <select name="clientType" value={formData.clientType} onChange={handleChange} className={`w-full appearance-none bg-black/5 dark:bg-[#222] border ${errors.clientType ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white`}>
-                  <option value="" className="text-black/70 dark:text-white/80 bg-white dark:bg-[#222]">{t("quote.selectClientType")}</option>
-                  {clientTypes.map((type, i) => <option key={i} value={type.name} className="bg-white dark:bg-[#222] text-black dark:text-white">{type.name}</option>)}
+                <select name="clientType" value={formData.clientType} onChange={handleChange} className={`w-full appearance-none bg-black/40 border ${errors.clientType ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white`}>
+                  <option value="" className="text-white/80 ">{t("quote.selectClientType")}</option>
+                  {clientTypes.map((type, i) => <option key={i} value={type.name} className="  text-white">{type.name}</option>)}
                 </select>
-                <ChevronDown className="w-5 h-5 absolute rtl:left-4 ltr:right-4 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/80 pointer-events-none" />
+                <ChevronDown className="w-5 h-5 absolute rtl:left-4 ltr:right-4 top-1/2 -translate-y-1/2 text-white/80 pointer-events-none" />
               </div>
               {errors.clientType && <p className="text-red-500 text-xs mt-1">{errors.clientType}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold mb-2 text-black/80 dark:text-white/80">{t("quote.eventType")}</label>
+              <label className="block text-sm font-bold mb-2 text-white/80">{t("quote.eventType")}</label>
               <div className="relative">
-                <select name="eventType" value={formData.eventType} onChange={handleChange} className={`w-full appearance-none bg-black/5 dark:bg-[#222] border ${errors.eventType ? 'border-red-500' : 'border-black/10 dark:border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white`}>
-                  <option value="" className="text-black/70 dark:text-white/80 bg-white dark:bg-[#222]">{t("quote.selectEventType")}</option>
-                  {eventTypes.map((type, i) => <option key={i} value={type.name} className="bg-white dark:bg-[#222] text-black dark:text-white">{type.name}</option>)}
+                <select name="eventType" value={formData.eventType} onChange={handleChange} className={`w-full appearance-none bg-black/40 border ${errors.eventType ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white`}>
+                  <option value="" className="text-white/80 ">{t("quote.selectEventType")}</option>
+                  {eventTypes.map((type, i) => <option key={i} value={type.name} className="  text-white">{type.name}</option>)}
                 </select>
-                <ChevronDown className="w-5 h-5 absolute rtl:left-4 ltr:right-4 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/80 pointer-events-none" />
+                <ChevronDown className="w-5 h-5 absolute rtl:left-4 ltr:right-4 top-1/2 -translate-y-1/2 text-white/80 pointer-events-none" />
               </div>
               {errors.eventType && <p className="text-red-500 text-xs mt-1">{errors.eventType}</p>}
             </div>
@@ -2542,11 +2563,11 @@ const QuoteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void 
           
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-bold text-black/80 dark:text-white/80">{language === 'ar' ? 'ملاحظات إضافية' : 'Additional Notes'}</label>
+              <label className="block text-sm font-bold text-white/80">{language === 'ar' ? 'ملاحظات إضافية' : 'Additional Notes'}</label>
               <button 
                 type="button"
                 onClick={toggleListening}
-                className={`p-2 rounded-full flex items-center justify-center transition-colors ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-black/5 dark:bg-white/5 text-black/80 dark:text-white/90 hover:text-amber-500 hover:bg-black/10 dark:hover:bg-white/10'}`}
+                className={`p-2 rounded-full flex items-center justify-center transition-colors ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-white/5 text-white/90 hover:text-amber-500 hover:bg-black/10 dark:hover:bg-white/10'}`}
                 title={language === 'ar' ? 'تحدث لإضافة ملاحظات' : 'Speak to add notes'}
               >
                 <Mic className="w-4 h-4" />
@@ -2558,7 +2579,7 @@ const QuoteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void 
               onChange={handleChange} 
               rows={3}
               placeholder={language === 'ar' ? 'اكتب أو تحدث هنا...' : 'Write or speak here...'}
-              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-black dark:text-white resize-none"
+              className="w-full bg-bdark:/5 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white resize-none"
             ></textarea>
           </div>
 
@@ -2698,7 +2719,7 @@ const MapReviewsOverlay = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.8 }}
           transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
-          className="bg-white/95 dark:bg-black/90 backdrop-blur-md px-4 py-3 rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 max-w-[250px] md:max-w-[300px] text-center relative"
+          className="/95 dark:bg-black/90 backdrop-blur-md px-4 py-3 rounded-2xl shadow-2xl border-white/10 max-w-[250px] md:max-w-[300px] text-center relative"
         >
           {/* Tail of the speech bubble */}
           <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-t-[14px] border-t-white/95 dark:border-t-black/90 border-r-[10px] border-r-transparent drop-shadow-md"></div>
@@ -2708,10 +2729,10 @@ const MapReviewsOverlay = () => {
               <Star key={i} className="w-3.5 h-3.5 fill-current" />
             ))}
           </div>
-          <p className="text-black/80 dark:text-white/80 text-xs md:text-sm font-medium mb-1.5 leading-relaxed" dir="rtl">
+          <p className="text-white/80 text-xs md:text-sm font-medium mb-1.5 leading-relaxed" dir="rtl">
             "{mockReviews[currentIndex].text}"
           </p>
-          <span className="text-[10px] text-black/70 dark:text-white/80 font-bold block">
+          <span className="text-[10px] text-white/80 font-bold block">
             {mockReviews[currentIndex].author} - عبر جوجل ماب
           </span>
         </motion.div>
@@ -2722,19 +2743,21 @@ const MapReviewsOverlay = () => {
 
 const MapSection = () => {
   return (
-    <SectionWrapper id="map" className="bg-white dark:bg-[#0a0a0a] py-8 md:py-20 border-b border-black/5 dark:border-white/5">
+    <SectionWrapper id="map" className=" py-8 md:py-20 ">
       <div className="max-w-7xl mx-auto px-6">
-        <ScrollReveal>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-5xl font-bold heading-gradient title-accent-center mb-6">حياكم</h2>
-            <p className="text-black/80 dark:text-white/90 max-w-2xl mx-auto text-lg">نسعد بزيارتكم لنا في مقرنا</p>
+        <div className="text-center mb-12">
+            <ScrollReveal type="fade-down" distance={20}>
+              <h2 className="text-3xl md:text-5xl font-bold heading-gradient title-accent-center mb-6">حياكم</h2>
+            </ScrollReveal>
+            <ScrollReveal type="fade-up" delay={0.2} distance={20}>
+              <p className="text-white/90 max-w-2xl mx-auto text-lg">نسعد بزيارتكم لنا في مقرنا</p>
+            </ScrollReveal>
           </div>
-        </ScrollReveal>
-        <ScrollReveal className="delay-100">
+        <ScrollReveal type="fade-up" delay={0.4} distance={30}>
           <div className="relative max-w-5xl mx-auto">
             <div className="animated-border-container shadow-sm dark:shadow-md">
               <div className="animated-border-gradient"></div>
-              <div className="relative bg-white dark:bg-[#111] rounded-[22px] overflow-hidden z-10 h-[400px] md:h-[500px] p-2">
+              <div className="relative  rounded-[22px] overflow-hidden z-10 h-[400px] md:h-[500px] p-2">
                 <div className="w-full h-full rounded-[16px] overflow-hidden relative">
                   <iframe 
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4242.39251162464!2d46.5761172!3d24.5809918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f0fef903a6473%3A0xa51160831c34a8c0!2z2LTYsdmD2Kkg2KfZitmB2YbYqiDZhNin2YrZgQ!5e1!3m2!1sar!2ssa!4v1784041066433!5m2!1sar!2ssa" 
@@ -2764,11 +2787,11 @@ const AnnouncementBanner = () => {
       <div className="flex animate-marquee whitespace-nowrap min-w-full" dir="ltr">
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className={`flex items-center gap-6 px-4 text-[10px] md:text-xs ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-            <span className="font-bold flex items-center gap-1.5"><Star className="w-3.5 h-3.5 animate-[spin_3s_linear_infinite] text-yellow-300" /> {t('banner.1')}</span>
+            <span className="font-bold flex items-center gap-1.5"><Star className="w-3.5 h-3.5 animate-pulse text-yellow-300" /> {t('banner.1')}</span>
             <span className="font-bold flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5 animate-pulse text-blue-200" /> {t('banner.2')}</span>
-            <span className="font-bold flex items-center gap-1.5"><Video className="w-3.5 h-3.5 animate-[bounce_2s_infinite] text-green-300" /> {t('banner.3')}</span>
+            <span className="font-bold flex items-center gap-1.5"><Video className="w-3.5 h-3.5 animate-pulse text-green-300" /> {t('banner.3')}</span>
             <span className="font-bold flex items-center gap-1.5"><Radio className="w-3.5 h-3.5 animate-pulse text-red-200" /> {t('banner.4')}</span>
-            <span className="font-bold flex items-center gap-1.5"><Camera className="w-3.5 h-3.5 animate-[spin_4s_linear_infinite] text-purple-200" /> {t('banner.5')}</span>
+            <span className="font-bold flex items-center gap-1.5"><Camera className="w-3.5 h-3.5 opacity-80 text-purple-200" /> {t('banner.5')}</span>
           </div>
         ))}
       </div>
@@ -2789,7 +2812,9 @@ export default function App() {
   };
 
   return (
-    <div className="font-sans selection:bg-amber-500/30 selection:text-amber-500 bg-gray-50 dark:bg-[#050505] text-black dark:text-white">
+    <ActiveSceneProvider>
+    <div className="font-sans selection:bg-amber-500/30 selection:text-amber-500 text-white">
+      <CinematicBackground />
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
@@ -2843,6 +2868,7 @@ export default function App() {
       <Footer socialLinks={data.socialLinks} />
       <FloatingActionButtons />
     </div>
+    </ActiveSceneProvider>
   );
 
 }

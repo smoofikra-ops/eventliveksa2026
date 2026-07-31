@@ -143,7 +143,7 @@ export const CustomHeroSequence = () => {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.5, ease: "easeOut" }}
+      transition={{ duration: 1.5, delay: 0.8, ease: "easeOut" }}
       className="relative" >
       {/* Particles Overlay Behind Text */}
       <div className="absolute -inset-10 z-[-1] pointer-events-none overflow-hidden">
@@ -215,9 +215,12 @@ export const CustomHeroSequence = () => {
             animate={{ opacity: 1, y: 0 }}
             className="absolute -bottom-16 right-20 md:right-40 text-amber-500 pointer-events-none"
           >
-             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-bounce drop-shadow-[0_0_8px_rgba(255,138,0,0.5)]">
+             <motion.svg 
+                animate={{ y: [0, 8, 0] }} 
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} 
+                width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_8px_rgba(255,138,0,0.5)]">
                 <path d="M12 5v14M19 12l-7 7-7-7"/>
-             </svg>
+             </motion.svg>
           </motion.div>
         )}
       </AnimatePresence>
