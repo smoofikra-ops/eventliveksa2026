@@ -663,10 +663,17 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
     <StorySection id="hero" className="relative min-h-[100svh] flex flex-col md:flex-row md:items-center pt-20 overflow-hidden dark flex-grow">
       <CameraFrameOverlay />
       
-      {/* Cinematic gradient to ensure text readability */}
-      
-
-      
+      <div className="absolute inset-0 z-0">
+        <video
+          src="https://res.cloudinary.com/ozd726ro/video/upload/v1785598675/%D9%81%D9%8A%D8%AF%D9%8A%D9%88_%D8%A7%D9%84%D9%87%D9%8A%D8%B1%D9%88_%D8%A7%D9%8A%D9%81%D9%86%D8%AA_%D9%84%D8%A7%D9%8A%D9%81_1_cic52q.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#050505]"></div>
+      </div>
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-10 md:py-20 flex-1 flex flex-col justify-center items-center text-center">
@@ -718,42 +725,38 @@ const StatsSection = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10 md:mb-16">
           <ScrollReveal type="fade-down" distance={20}>
-            <h2 className="text-3xl md:text-[40px] font-semibold text-white mb-6 md:mb-8 title-accent-center heading-gradient">
+            <h2 className="text-3xl md:text-[40px] font-semibold text-white mb-6 md:mb-8 title-accent-center">
               {t("stats.title")}
             </h2>
           </ScrollReveal>
         </div>
         
         <ScrollReveal type="fade-up" delay={0.2} distance={30}>
-          <div className="animated-border-container group">
-            <div className="animated-border-gradient"></div>
-            
-            <div className="relative z-10 rounded-[22px] p-6 md:p-20 border ">
-              <div className="grid grid-cols-3 gap-4 md:gap-12">
-                <ScrollReveal type="fade-left" delay={0.4} distance={20} className="flex flex-col items-center text-center">
-                  <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
+          <div className="relative z-10 bg-white/80 dark:bg-white/10 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-black/5 dark:border-white/20 shadow-xl transition-all duration-500 hover:-translate-y-2 hover:bg-white hover:dark:bg-white/15 hover:shadow-[0_20px_40px_-10px_rgba(255,138,0,0.3)] mx-auto group animate-subtle-pulse hover:animate-none">
+              <div className="grid grid-cols-3 gap-2 md:gap-8 divide-x divide-black/10 dark:divide-white/10 rtl:divide-x-reverse">
+                <ScrollReveal type="fade-left" delay={0.4} distance={20} className="flex flex-col items-center text-center px-2">
+                  <div className="text-4xl md:text-6xl font-black text-gradient mb-2 font-mono tabular-nums tracking-tighter animate-digital-glow group-hover:scale-105 transition-transform duration-300">
                     <Counter value={348} />
                   </div>
-                  <div className="text-[10px] md:text-lg text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.events")}</div>
+                  <div className="text-[10px] md:text-sm text-black/70 dark:text-white/70 uppercase tracking-widest font-bold">{t("stats.events")}</div>
                 </ScrollReveal>
                 
-                <ScrollReveal type="fade-up" delay={0.5} distance={20} className="flex flex-col items-center text-center border-x border-white/10 px-2 md:px-0">
-                  <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
+                <ScrollReveal type="fade-up" delay={0.5} distance={20} className="flex flex-col items-center text-center px-2">
+                  <div className="text-4xl md:text-6xl font-black text-gradient mb-2 font-mono tabular-nums tracking-tighter animate-digital-glow group-hover:scale-105 transition-transform duration-300" style={{ animationDelay: '200ms' }}>
                     <Counter value={8} />
                   </div>
-                  <div className="text-[10px] md:text-lg text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.cities")}</div>
+                  <div className="text-[10px] md:text-sm text-black/70 dark:text-white/70 uppercase tracking-widest font-bold">{t("stats.cities")}</div>
                 </ScrollReveal>
                 
-                <ScrollReveal type="fade-right" delay={0.6} distance={20} className="flex flex-col items-center text-center">
-                  <div className="text-3xl sm:text-4xl md:text-8xl font-black text-gradient mb-2 md:mb-4 drop-shadow-[0_0_20px_rgba(255,138,0,0.3)]">
+                <ScrollReveal type="fade-right" delay={0.6} distance={20} className="flex flex-col items-center text-center px-2">
+                  <div className="text-4xl md:text-6xl font-black text-gradient mb-2 relative flex items-center justify-center font-mono tabular-nums tracking-tighter animate-digital-glow group-hover:scale-105 transition-transform duration-300" style={{ animationDelay: '400ms' }}>
                     <Counter value={100} />
-                    <span className="text-xl sm:text-2xl md:text-5xl text-amber-500 absolute -top-1 sm:-top-2 md:-top-4 -right-2 sm:-right-4 md:-right-8">+</span>
+                    <span className="text-xl md:text-3xl text-amber-500 absolute -top-1 md:-top-2 -right-3 md:-right-6">+</span>
                   </div>
-                  <div className="text-[10px] md:text-lg text-white/80 uppercase tracking-wider md:tracking-[0.3em] font-black leading-tight">{t("stats.clients")}</div>
+                  <div className="text-[10px] md:text-sm text-black/70 dark:text-white/70 uppercase tracking-widest font-bold">{t("stats.clients")}</div>
                 </ScrollReveal>
               </div>
             </div>
-          </div>
         </ScrollReveal>
       </div>
     </SectionWrapper>
@@ -811,7 +814,7 @@ const Services = ({ services }: { services: Service[] }) => {
       <SectionWrapper id="services" className=" py-8 md:py-16 ">
         <div className="text-center mb-12 md:mb-20">
         <ScrollReveal type="fade-down" distance={20}>
-          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("services.title")}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center text-white truncate w-full max-w-full block">{t("services.title")}</h2>
         </ScrollReveal>
         <ScrollReveal type="fade-up" delay={0.2} distance={20}>
           <p className="text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal px-4">
@@ -1146,7 +1149,7 @@ const Portfolio = ({ works }: { works: Work[] }) => {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
         <div>
           <ScrollReveal type="fade-right" distance={20}>
-            <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent heading-gradient truncate w-full max-w-full block">{t('portfolio.title')}</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent text-white truncate w-full max-w-full block">{t('portfolio.title')}</h2>
           </ScrollReveal>
           <ScrollReveal type="fade-up" delay={0.2} distance={20}>
             <p className="text-white/80 max-w-[60ch] text-lg md:text-xl font-medium font-normal">
@@ -1465,7 +1468,7 @@ const FAQ = () => {
       })}} />
       <div className="text-center mb-16">
         <ScrollReveal type="fade-down" distance={20}>
-          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent-center heading-gradient truncate w-full max-w-full block">{t("nav.faq")}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent-center text-white truncate w-full max-w-full block">{t("nav.faq")}</h2>
         </ScrollReveal>
         <ScrollReveal type="fade-up" delay={0.2} distance={20}>
           <p className="text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium font-normal">{t('faq.subtitle')}</p>
@@ -1519,7 +1522,7 @@ const Process = () => {
     <SectionWrapper id="process" className=" py-8 md:py-16 ">
       <div className="text-center mb-16 md:mb-20">
         <ScrollReveal type="fade-down" distance={20}>
-          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center heading-gradient truncate w-full max-w-full block">{t("process.title")}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent-center text-white truncate w-full max-w-full block">{t("process.title")}</h2>
         </ScrollReveal>
         <ScrollReveal type="fade-up" delay={0.2} distance={20}>
           <p className="text-white/80 max-w-[70ch] mx-auto text-lg md:text-xl font-medium">{t('process.stepsDesc')}</p>
@@ -1568,13 +1571,17 @@ const Partners = ({ partners = [] }: { partners?: Partner[] }) => {
     <SectionWrapper id="partners" className=" py-8 md:py-16 overflow-hidden ">
       <div className="max-w-7xl mx-auto px-6 mb-12">
         <ScrollReveal>
-          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center heading-gradient mb-4 truncate w-full max-w-full block text-white">{t("partners.title")}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center text-white mb-4 truncate w-full max-w-full block">{t("partners.title")}</h2>
           <p className="text-center text-white/80">{t('partners.trustDesc')}</p>
         </ScrollReveal>
       </div>
       <div 
         className="relative w-full overflow-hidden flex bg-transparent py-8" 
         dir="ltr"
+        style={{
+          maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)'
+        }}
         onMouseEnter={() => {
           setIsHovered(true);
           setJustLeft(false);
@@ -1585,9 +1592,6 @@ const Partners = ({ partners = [] }: { partners?: Partner[] }) => {
           setTimeout(() => setJustLeft(false), 500);
         }}
       >
-        {/* Animated gradient fade at the edges for smoothness */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-48 bg-gradient-to-r from-white dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-48 bg-gradient-to-l from-white dark:from-[#0a0a0a] to-transparent z-10 pointer-events-none"></div>
         
         <div className={`transition-transform duration-500 ease-in-out ${justLeft ? 'translate-x-4' : 'translate-x-0'}`}>
           <div className={`flex w-max ${isHovered || justLeft ? '[animation-play-state:paused]' : '[animation-play-state:running]'} animate-marquee-slow py-4`}>
@@ -1774,18 +1778,27 @@ const Testimonials = () => {
     <SectionWrapper id="testimonials" className=" py-8 md:py-16 overflow-hidden relative ">
       <div className="max-w-7xl mx-auto px-6 mb-16 text-center">
         <ScrollReveal>
-          <AnimatedTitle text={t("testimonials.title")} className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center heading-gradient mb-4 truncate w-full max-w-full" />
+          <AnimatedTitle text={t("testimonials.title")} className="text-2xl sm:text-3xl md:text-[40px] font-semibold title-accent-center text-white mb-4 truncate w-full max-w-full" />
           <p className="text-white/80 text-lg mx-auto text-center">{t('testimonials.subtitle')}</p>
         </ScrollReveal>
       </div>
 
-      <ScrollReveal type="fade-right" distance={30} delay={0.4} className="relative w-full overflow-hidden flex bg-transparent py-4 group" dir="ltr">
-        <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused] py-2">
-          {[...testimonials, ...testimonials, ...testimonials].map((t, index) => (
-            <div key={index} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-              <TestimonialCard testimonial={t} />
-            </div>
-          ))}
+      <ScrollReveal type="fade-right" distance={30} delay={0.4} className="relative w-full overflow-hidden bg-transparent py-4 group" dir="ltr">
+        <div className="flex flex-nowrap">
+          <div className="flex flex-shrink-0 animate-marquee-infinite group-hover:[animation-play-state:paused] py-2">
+            {[...testimonials, ...testimonials, ...testimonials].map((t, index) => (
+              <div key={`set1-${index}`} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <TestimonialCard testimonial={t} />
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-shrink-0 animate-marquee-infinite group-hover:[animation-play-state:paused] py-2">
+            {[...testimonials, ...testimonials, ...testimonials].map((t, index) => (
+              <div key={`set2-${index}`} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <TestimonialCard testimonial={t} />
+              </div>
+            ))}
+          </div>
         </div>
       </ScrollReveal>
     </SectionWrapper>
@@ -1896,7 +1909,7 @@ const Contact = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <ScrollReveal type="fade-right" distance={30}>
-            <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent heading-gradient truncate w-full max-w-full block">{t("contact.title")}</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent text-white truncate w-full max-w-full block">{t("contact.title")}</h2>
             <p className="text-white/90 mb-12 text-base md:text-lg">{t('contact.formDesc')}</p>
             
             <div className="space-y-8">
@@ -2747,7 +2760,7 @@ const MapSection = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
             <ScrollReveal type="fade-down" distance={20}>
-              <h2 className="text-3xl md:text-5xl font-bold heading-gradient title-accent-center mb-6">حياكم</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-white title-accent-center mb-6">حياكم</h2>
             </ScrollReveal>
             <ScrollReveal type="fade-up" delay={0.2} distance={20}>
               <p className="text-white/90 max-w-2xl mx-auto text-lg">نسعد بزيارتكم لنا في مقرنا</p>
