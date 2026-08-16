@@ -2245,14 +2245,13 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
         
         <div className="flex flex-1 overflow-hidden">
           <div className="w-64 border-l lack/10 dark:border-white/10 p-4 flex flex-col gap-2 overflow-y-auto">
-            {['services', 'portfolio', 'social', 'hero', 'partners'].map(tab => (
+            {['services', 'portfolio', 'social', 'hero'].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)} className={`text-start px-4 py-3 rounded-lg font-bold transition-colors ${activeTab === tab ? 'bg-amber-500 text-black' : 'text-white/90 hover:bg-bdark:hover:bg-white/5'}`}>
                 {tab === 'services' && 'الخدمات'}
                 {tab === 'portfolio' && 'الأعمال'}
                 {tab === 'social' && 'التواصل الاجتماعي'}
                 {tab === 'hero' && 'الرئيسية'}
-                {tab === 'partners' && 'شركاء النجاح'}
-              </button>
+                </button>
             ))}
           </div>
           
