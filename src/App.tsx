@@ -236,21 +236,7 @@ const INITIAL_DATA: AppData = {
     { id: "69", title: "فيديو", category: "أعمال فيديو", img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=800", videoUrl: "https://drive.google.com/file/d/1y9R8BGNJGos64lOYM8hrfQP0ZlYOcPGv/preview" }
   ],
   partners: [
-    { id: "1", name: "Partner 1", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982655/ALJAZIRA_CAPITAL_LOGO_qssrgs.jpg" },
-    { id: "2", name: "Partner 2", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982666/ALRAJHI_CAPITAL_LOGO_y5vptj.jpg" },
-    { id: "3", name: "Partner 3", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982645/ARDARA_LOGO_cmkut0.jpg" },
-    { id: "4", name: "Partner 4", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982656/BADAEL_LOGO_vfxatu.jpg" },
-    { id: "5", name: "Partner 5", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982648/DIGITAL_GOVERNMENT_AUTHORITY_qaysvp.jpg" },
-    { id: "6", name: "Partner 6", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982659/INDUSTRIAL_CENTER_LOGO_bb1maq.jpg" },
-    { id: "7", name: "Partner 7", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982667/INILEVEN_LOGO_wgttos.jpg" },
-    { id: "8", name: "Partner 8", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982663/MINISTRY_OF_CULTURE_LOGO_o0m8qb.jpg" },
-    { id: "9", name: "Partner 9", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982698/MINISTRY_OF_HOUSING_LOGO_bwwxcp.jpg" },
-    { id: "10", name: "Partner 10", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982699/MINISTRY_OF_INDUSTRYAND_MINERAL_RESOURCES_LOGO_zng54u.jpg" },
-    { id: "11", name: "Partner 11", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982700/MINISTRY_OF_SPORT_LOGO_xx9iub.jpg" },
-    { id: "12", name: "Partner 12", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982701/MOIA_LOGO_dmz1sd.jpg" },
-    { id: "13", name: "Partner 13", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982702/MONSHAAT_LOGO_qwnlwh.jpg" },
-    { id: "14", name: "Partner 14", logo: "https://res.cloudinary.com/ozd726ro/image/upload/h_250,fl_preserve_transparency/v1783982703/NADEC_LOGO_e9tlii.jpg" },
-  ],
+    ],
   socialLinks: [
     { platform: 'twitter', url: 'https://twitter.com/eventliveksa' },
     { platform: 'instagram', url: 'https://instagram.com/eventliveksa' },
@@ -2879,8 +2865,7 @@ export default function App() {
         <Testimonials />
         <Contact />
         <MapSection />
-        {/* <Partners partners={data.partners} /> */}
-      </main>
+        </main>
       <Footer socialLinks={data.socialLinks} />
       <FloatingActionButtons />
     </div>

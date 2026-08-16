@@ -154,16 +154,13 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.whatsappText': 'مرحباً، أنا مهتم جداً ومتحمس لخدماتكم، أرجو التواصل معي.',
     'contact.alertSuccess': 'تم حفظ التغييرات بنجاح!',
     'process.stepsDesc': 'خطوات بسيطة تضمن لكم أفضل النتائج',
-    'partners.trustDesc': 'نفخر بالعمل مع الجهات الحكومية ونخبة من الشركات والمؤسسات',
-    'testimonials.trustDesc': 'نفخر بثقة عملائنا ونعتز بآرائهم',
+        'testimonials.trustDesc': 'نفخر بثقة عملائنا ونعتز بآرائهم',
     'contact.formDesc': 'نحن هنا للإجابة على استفساراتكم ومساعدتكم في تغطية فعالياتكم بأفضل شكل ممكن.',
 
     'contact.submitBtn': 'إرسال الآن',
 
     
-    'partners.title': 'شركاء النجاح',
-    'partners.subtitle': 'نفتخر بالعمل مع نخبة من الشركات والجهات الحكومية في المملكة.',
-    
+            
     'process.subtitle': 'عملية بسيطة ومنظمة لضمان الحصول على أفضل النتائج لعملائنا.',
     
     'stats.title': 'أرقام تتحدث',
@@ -370,16 +367,13 @@ const translations: Record<Language, Record<string, string>> = {
     'contact.whatsappText': 'Hello, I am very interested in your services. Please contact me.',
     'contact.alertSuccess': 'Changes saved successfully!',
     'process.stepsDesc': 'Simple steps that guarantee the best results',
-    'partners.trustDesc': 'We are proud to work with top companies and government entities',
-    'testimonials.trustDesc': 'We take pride in our clients trust and value their feedback',
+        'testimonials.trustDesc': 'We take pride in our clients trust and value their feedback',
     'contact.formDesc': 'We are here to answer your questions and help you cover your events in the best way possible.',
 
     'contact.submitBtn': 'Send Now',
 
     
-    'partners.title': 'Success Partners',
-    'partners.subtitle': 'We are proud to work with an elite group of companies and government entities.',
-    
+            
     'process.subtitle': 'A simple and organized process to ensure the best results for our clients.',
     
     'stats.title': 'Numbers Talk',
