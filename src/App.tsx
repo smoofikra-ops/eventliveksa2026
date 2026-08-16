@@ -1765,7 +1765,10 @@ const Testimonials = () => {
     { name: t('testimonial.2.name'), role: t('testimonial.2.role'), text: t('testimonial.2.text') },
     { name: t('testimonial.3.name'), role: t('testimonial.3.role'), text: t('testimonial.3.text') },
     { name: t('testimonial.4.name'), role: t('testimonial.4.role'), text: t('testimonial.4.text') },
-    { name: t('testimonial.5.name'), role: t('testimonial.5.role'), text: t('testimonial.5.text') }
+    { name: t('testimonial.5.name'), role: t('testimonial.5.role'), text: t('testimonial.5.text') },
+    { name: t('testimonial.6.name'), role: t('testimonial.6.role'), text: t('testimonial.6.text') },
+    { name: t('testimonial.7.name'), role: t('testimonial.7.role'), text: t('testimonial.7.text') },
+    { name: t('testimonial.8.name'), role: t('testimonial.8.role'), text: t('testimonial.8.text') }
   ];
 /*
     { name: "أحمد محمد", role: "مدير فعاليات", text: "تجربة رائعة مع فريق EventLive. الاحترافية في التعامل وجودة التصوير كانت تفوق التوقعات. شكراً لكم على توثيق فعاليتنا بأجمل صورة." },
@@ -1787,14 +1790,14 @@ const Testimonials = () => {
         <div className="flex flex-nowrap">
           <div className="flex flex-shrink-0 animate-marquee-infinite group-hover:[animation-play-state:paused] py-2">
             {[...testimonials, ...testimonials, ...testimonials].map((t, index) => (
-              <div key={`set1-${index}`} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+              <div key={`set1-${index}`} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw] flex-shrink-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <TestimonialCard testimonial={t} />
               </div>
             ))}
           </div>
           <div className="flex flex-shrink-0 animate-marquee-infinite group-hover:[animation-play-state:paused] py-2">
             {[...testimonials, ...testimonials, ...testimonials].map((t, index) => (
-              <div key={`set2-${index}`} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+              <div key={`set2-${index}`} className="mx-2 sm:mx-4 w-[85vw] sm:w-[50vw] md:w-[40vw] lg:w-[35vw] flex-shrink-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <TestimonialCard testimonial={t} />
               </div>
             ))}
@@ -2868,7 +2871,6 @@ export default function App() {
 
       <main role="main" className="relative">
         <Hero videoUrl={data.heroVideoUrl} onQuoteClick={() => setIsQuoteOpen(true)} />
-        <Partners partners={data.partners} />
         <StatsSection />
         <Services services={data.services} />
         <Portfolio works={data.works} />
@@ -2877,6 +2879,7 @@ export default function App() {
         <Testimonials />
         <Contact />
         <MapSection />
+        {/* <Partners partners={data.partners} /> */}
       </main>
       <Footer socialLinks={data.socialLinks} />
       <FloatingActionButtons />
