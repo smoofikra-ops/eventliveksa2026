@@ -153,7 +153,7 @@ export const getGridSpanClass = (index: number, total: number) => {
 };
 
 const INITIAL_DATA: AppData = {
-  heroVideoUrl: 'https://a.top4top.io/m_385032blp1.mov',
+  heroVideoUrl: 'https://nmolabs-cdn.b-cdn.net/eventlive/website/home/hero/%D9%81%D9%8A%D8%AF%D9%8A%D9%88%20%D8%A7%D9%84%D9%87%D9%8A%D8%B1%D9%88%20%D8%A7%D9%8A%D9%81%D9%86%D8%AA%20%D9%84%D8%A7%D9%8A%D9%81.mp4',
   services: [
     { id: '1', title: "المعارض", desc: "نبرز حضوركم المميز من خلال تغطية احترافية تشمل أجنحة الزوار والفعاليات المصاحبة، بواسطة كاميرات احترافية ودرون.", iconName: 'Layout', mediaType: 'image', mediaValue: 'https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1783983632/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_%D9%85%D8%B9%D8%B1%D8%B6_water_expo_wfofmm.jpg', cardBgImage: 'https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1783983632/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_%D9%85%D8%B9%D8%B1%D8%B6_water_expo_wfofmm.jpg' },
     { id: '2', title: "المهرجانات", desc: "نوثق أجواء المهرجانات بكل تفاصيلها، من لحظات التفاعل الجماهيري إلى العروض الترفيهية، مع إنتاج فيديوهات مميزة.", iconName: 'Users', mediaType: 'image', mediaValue: 'https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1783983460/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_IMG_9484_siyppe.jpg', cardBgImage: 'https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1783983460/%D9%86%D8%B3%D8%AE%D8%A9_%D9%85%D9%86_IMG_9484_siyppe.jpg' },
@@ -651,14 +651,14 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
       
       <div className="absolute inset-0 z-0">
         <video
-          src="https://res.cloudinary.com/ozd726ro/video/upload/v1785598675/%D9%81%D9%8A%D8%AF%D9%8A%D9%88_%D8%A7%D9%84%D9%87%D9%8A%D8%B1%D9%88_%D8%A7%D9%8A%D9%81%D9%86%D8%AA_%D9%84%D8%A7%D9%8A%D9%81_1_cic52q.mp4"
+          src="https://nmolabs-cdn.b-cdn.net/eventlive/website/home/hero/%D9%81%D9%8A%D8%AF%D9%8A%D9%88%20%D8%A7%D9%84%D9%87%D9%8A%D8%B1%D9%88%20%D8%A7%D9%8A%D9%81%D9%86%D8%AA%20%D9%84%D8%A7%D9%8A%D9%81.mp4"
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-cover opacity-80"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#050505]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[#050505]/90"></div>
       </div>
 
       {/* Content */}
