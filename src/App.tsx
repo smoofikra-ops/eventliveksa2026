@@ -2853,7 +2853,6 @@ export default function App() {
   return (
     <ActiveSceneProvider>
     <div className="font-sans selection:bg-amber-500/30 selection:text-amber-500 text-white">
-      <CinematicBackground />
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
@@ -2893,16 +2892,22 @@ export default function App() {
       </AnimatePresence>
 
       <main role="main" className="relative">
+        {/* Upper Sections - Untouched: Hero, Statistics, Featured Services */}
         <Hero videoUrl={data.heroVideoUrl} onQuoteClick={() => setIsQuoteOpen(true)} />
         <StatsSection />
         <Services services={data.services} />
-        <Portfolio works={data.works} />
-        <FAQ />
-        <Process />
-        <Testimonials />
-        <Contact />
-        <MapSection />
-        </main>
+
+        {/* Lower Sections - Cinematic Video Storytelling Environment (Portfolio -> Map) */}
+        <div id="lower-cinematic-zone" className="relative z-0">
+          <CinematicBackground />
+          <Portfolio works={data.works} />
+          <FAQ />
+          <Process />
+          <Testimonials />
+          <Contact />
+          <MapSection />
+        </div>
+      </main>
       <Footer socialLinks={data.socialLinks} />
       <FloatingActionButtons />
     </div>

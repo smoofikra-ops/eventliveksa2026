@@ -1,80 +1,146 @@
-import React, { useEffect, useState } from 'react';
-import { cinematicScenes } from '../../data/cinematicScenes';
+import React, { useEffect, useRef, useState } from 'react';
 import { useActiveScene } from '../../hooks/useActiveScene';
-import { getCloudinaryImageUrl, getCloudinarySrcSet } from '../../utils/cloudinary';
-import { motion, useSpring, useTransform } from 'framer-motion';
+
+const VIDEO_1_URL = "https://nmolabs-cdn.b-cdn.net/eventlive/website/home/backgrounds/videos/eventlive-official.mp4";
+const VIDEO_2_URL = "https://nmolabs-cdn.b-cdn.net/eventlive/website/home/backgrounds/videos/souq-addar-eventlive.mp4";
 
 export const CinematicBackground: React.FC = () => {
   const { activeSceneId } = useActiveScene();
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const video1Ref = useRef<HTMLVideoElement>(null);
+  const video2Ref = useRef<HTMLVideoElement>(null);
 
-  // Create a spring value that oscillates between 0 and 1
-  const progress = useSpring(0, {
-    stiffness: 2,
-    damping: 15,
-    mass: 2
-  });
-
+  // Check prefers-reduced-motion
   useEffect(() => {
-    let expanded = true;
-    progress.set(1);
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
 
-    const interval = setInterval(() => {
-      expanded = !expanded;
-      progress.set(expanded ? 1 : 0);
-    }, 12000);
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
 
-    return () => clearInterval(interval);
-  }, [progress]);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
-  const scale = useTransform(progress, [0, 1], [1, 1.08]);
-  const x = useTransform(progress, [0, 1], ["0%", "-1.5%"]);
-  const y = useTransform(progress, [0, 1], ["0%", "-1%"]);
-
+  // IntersectionObserver to observe if the lower storytelling section is in or near viewport
   useEffect(() => {
-    const currentIndex = cinematicScenes.findIndex(s => s.id === activeSceneId);
-    if (currentIndex >= 0 && currentIndex < cinematicScenes.length - 1) {
-      const nextImg = new Image();
-      nextImg.src = getCloudinaryImageUrl(cinematicScenes[currentIndex + 1].url, 1920);
+    const el = containerRef.current?.parentElement;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      {
+        root: null,
+        rootMargin: '400px 0px 400px 0px',
+        threshold: 0,
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Determine active video index
+  // Video 1 covers: portfolio, faq
+  // Video 2 covers: process, testimonials, contact, map
+  const isVideo2Active = ['process', 'testimonials', 'contact', 'map'].includes(activeSceneId);
+
+  // Manage video play/pause safely based on visibility and motion preferences
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      video1Ref.current?.pause();
+      video2Ref.current?.pause();
+      return;
     }
-  }, [activeSceneId]);
+
+    if (isInViewport) {
+      if (video1Ref.current) {
+        const p1 = video1Ref.current.play();
+        if (p1 !== undefined) {
+          p1.catch(() => {});
+        }
+      }
+      if (video2Ref.current) {
+        const p2 = video2Ref.current.play();
+        if (p2 !== undefined) {
+          p2.catch(() => {});
+        }
+      }
+    } else {
+      video1Ref.current?.pause();
+      video2Ref.current?.pause();
+    }
+  }, [isInViewport, prefersReducedMotion]);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.5, ease: "easeOut" }}
-      className="fixed inset-0 z-[-1] overflow-hidden bg-[#050505] pointer-events-none"
+    <div
+      ref={containerRef}
+      aria-hidden="true"
+      className="pointer-events-none select-none absolute inset-0 z-0 overflow-hidden"
     >
-      {cinematicScenes.map((scene, index) => {
-        const isActive = scene.id === activeSceneId;
-        
-        return (
-          <div
-            key={scene.id}
-            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
-          >
-            <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(180deg, rgba(5, 7, 8, 0.55), rgba(5, 7, 8, 0.72))' }}></div>
-            
-            <motion.div 
-              className="w-full h-full"
-              style={{ scale, x, y }}
+      {/* Pinned Sticky Viewport Container across the Lower Section */}
+      <div className="sticky top-0 left-0 w-full h-[100svh] min-h-screen overflow-hidden">
+        {/* If user prefers reduced motion, render a subtle atmospheric static gradient */}
+        {prefersReducedMotion ? (
+          <div className="absolute inset-0 bg-[#07090b]" />
+        ) : (
+          <>
+            {/* Video 1: Event Live Official (Portfolio -> FAQ) */}
+            <div
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
+                !isVideo2Active ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
             >
-              <img
-                src={getCloudinaryImageUrl(scene.url, 1920)}
-                srcSet={getCloudinarySrcSet(scene.url)}
-                sizes="100vw"
-                alt=""
-                fetchPriority={index === 0 ? "high" : "auto"}
-                loading={index === 0 ? "eager" : "lazy"}
-                decoding="async"
-                className="w-full h-full object-cover origin-center" style={{ filter: 'brightness(0.35) contrast(0.85) saturate(0.75) blur(2px)' }}
+              <video
+                ref={video1Ref}
+                src={VIDEO_1_URL}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover object-center"
               />
-            </motion.div>
-          </div>
-        );
-      })}
-    </motion.div>
+            </div>
+
+            {/* Video 2: Souq Addar (Process -> Testimonials -> Contact -> Map) */}
+            <div
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
+                isVideo2Active ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
+            >
+              <video
+                ref={video2Ref}
+                src={VIDEO_2_URL}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Cinematic Readability Overlays */}
+        {/* Base dark translucent layer for pristine text readability */}
+        <div className="absolute inset-0 bg-[#050505]/70 z-20" />
+
+        {/* Top blend transition from Featured Services (#050505) into Video 1 */}
+        <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent z-20" />
+
+        {/* Center vignette to focus attention on foreground content */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,5,5,0.25)_0%,rgba(5,5,5,0.8)_100%)] z-20" />
+
+        {/* Bottom blend transition into Footer */}
+        <div className="absolute bottom-0 left-0 right-0 h-44 bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent z-20" />
+      </div>
+    </div>
   );
 };

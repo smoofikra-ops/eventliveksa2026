@@ -8,22 +8,22 @@ type StorySectionProps = {
 };
 
 export const StorySection: React.FC<StorySectionProps> = ({ id, children, className = '' }) => {
-  const { setActiveSceneId, activeSceneId } = useActiveScene();
+  const { setActiveSceneId } = useActiveScene();
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+          if (entry.isIntersecting) {
             setActiveSceneId(id);
           }
         });
       },
       {
         root: null,
-        rootMargin: '0px',
-        threshold: [0.3, 0.5, 0.7],
+        rootMargin: '-15% 0px -15% 0px',
+        threshold: [0.15, 0.4],
       }
     );
 
@@ -42,9 +42,7 @@ export const StorySection: React.FC<StorySectionProps> = ({ id, children, classN
     <section 
       id={id} 
       ref={sectionRef} 
-      className={`relative w-full transition-opacity duration-700 ease-out ${
-        activeSceneId === id ? 'opacity-100' : 'opacity-80'
-      } ${className}`}
+      className={`relative w-full ${className}`}
     >
       {children}
     </section>
