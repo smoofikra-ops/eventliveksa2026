@@ -494,7 +494,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
       <div className="hide-on-video hidden md:flex fixed top-10 left-0 right-0 z-[90] h-20 items-center px-8 bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-sm transition-all justify-between">
         <div className="w-[100px] xl:w-[200px] flex justify-start items-center">
           <a href="#home" className="flex items-center">
-            <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className={`h-10 object-contain transition-all duration-500 ${logoClass}`}  loading="lazy" />
+            <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className={`h-10 object-contain transition-all duration-500 ${logoClass}`}  loading="lazy" />
           </a>
         </div>
         
@@ -550,7 +550,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
       <div className="hide-on-video md:hidden fixed top-10 left-0 right-0 z-[100] h-16 flex items-center justify-between px-4 bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-sm">
         <div className="flex-1 flex justify-start">
           <a href="#home" className="flex items-center">
-            <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-8 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
+            <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className="h-8 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
           </a>
         </div>
         <div className="flex-1 flex justify-center"></div>
@@ -584,7 +584,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
         className={`md:hidden fixed top-0 bottom-0 w-[300px] bg-[#0a0c0d]/90 backdrop-blur-3xl z-[95] border-white/10 flex flex-col p-6 shadow-2xl ${language === "ar" ? "left-0 border-r" : "right-0 border-l"}`}
       >
         <div className="flex items-center gap-2 mb-10 mt-2">
-          <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-10 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
+          <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className="h-10 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
         </div>
 
         <ul className="space-y-2 flex-1" onMouseLeave={() => setHoveredIndex(null)}>
@@ -2059,7 +2059,7 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12 mb-16">
           <div className="mb-4 md:mb-0">
             <a href="#home" className="flex items-center gap-2 mb-6">
-              <img src={getOptimizedImageUrl("https://res.cloudinary.com/ozd726ro/image/upload/f_auto,q_auto,w_1080/v1784025230/74dbadce-8a3f-4270-b985-83a0cad432e1.png")} alt="EventLive" className="h-12 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
+              <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className="h-12 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
             </a>
             <p className="text-white/90 mb-6 leading-relaxed">
               {t("footer.companyDesc")}
