@@ -8,6 +8,8 @@ export const CinematicBackground: React.FC = () => {
   const { activeSceneId } = useActiveScene();
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isInViewport, setIsInViewport] = useState(false);
+  const [isLowerChapterActive, setIsLowerChapterActive] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
@@ -45,12 +47,35 @@ export const CinematicBackground: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Determine active video index
-  // Video 1 covers: portfolio, faq
-  // Video 2 covers: process, testimonials, contact, map
-  const isVideo2Active = ['process', 'testimonials', 'contact', 'map'].includes(activeSceneId);
+  // Coordinated section detection for Video 2 activation (Process, Testimonials, Contact, Map)
+  useEffect(() => {
+    const checkActiveSection = () => {
+      const processEl = document.getElementById('process');
+      if (processEl) {
+        const rect = processEl.getBoundingClientRect();
+        // Video 2 activates when the top of Process section enters the upper half of viewport
+        if (rect.top <= window.innerHeight * 0.65) {
+          setIsLowerChapterActive(true);
+          return;
+        }
+      }
+      setIsLowerChapterActive(false);
+    };
 
-  // Manage video play/pause safely based on visibility and motion preferences
+    window.addEventListener('scroll', checkActiveSection, { passive: true });
+    window.addEventListener('resize', checkActiveSection, { passive: true });
+    checkActiveSection();
+
+    return () => {
+      window.removeEventListener('scroll', checkActiveSection);
+      window.removeEventListener('resize', checkActiveSection);
+    };
+  }, []);
+
+  // Combined determination of Video 2 active state (from hook or scroll position)
+  const isVideo2Active = isLowerChapterActive || ['process', 'testimonials', 'contact', 'map'].includes(activeSceneId);
+
+  // Play/pause and stream management
   useEffect(() => {
     if (prefersReducedMotion) {
       video1Ref.current?.pause();
@@ -93,7 +118,7 @@ export const CinematicBackground: React.FC = () => {
             {/* Video 1: Event Live Official (Portfolio -> FAQ) */}
             <div
               className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
-                !isVideo2Active ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                !isVideo2Active ? 'opacity-100' : 'opacity-0'
               }`}
             >
               <video
@@ -103,7 +128,7 @@ export const CinematicBackground: React.FC = () => {
                 loop
                 muted
                 playsInline
-                preload="metadata"
+                preload="auto"
                 className="w-full h-full object-cover object-center"
               />
             </div>
@@ -111,7 +136,7 @@ export const CinematicBackground: React.FC = () => {
             {/* Video 2: Souq Addar (Process -> Testimonials -> Contact -> Map) */}
             <div
               className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
-                isVideo2Active ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                isVideo2Active ? 'opacity-100' : 'opacity-0'
               }`}
             >
               <video
@@ -121,7 +146,7 @@ export const CinematicBackground: React.FC = () => {
                 loop
                 muted
                 playsInline
-                preload="metadata"
+                preload="auto"
                 className="w-full h-full object-cover object-center"
               />
             </div>
@@ -129,17 +154,17 @@ export const CinematicBackground: React.FC = () => {
         )}
 
         {/* Cinematic Readability Overlays */}
-        {/* Base dark translucent layer for pristine text readability */}
-        <div className="absolute inset-0 bg-[#050505]/70 z-20" />
+        {/* Base dark translucent layer tuned for high visibility (~25%) */}
+        <div className="absolute inset-0 bg-[#050505]/25 z-10" />
 
-        {/* Top blend transition from Featured Services (#050505) into Video 1 */}
-        <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent z-20" />
+        {/* Top blend transition from Featured Services into Chapter 2 Video */}
+        <div className="absolute top-0 left-0 right-0 h-36 bg-gradient-to-b from-[#050505] via-[#050505]/60 to-transparent z-20" />
 
-        {/* Center vignette to focus attention on foreground content */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,5,5,0.25)_0%,rgba(5,5,5,0.8)_100%)] z-20" />
+        {/* Center subtle vignette to focus attention on foreground content while keeping footage crystal clear */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,5,5,0.05)_0%,rgba(5,5,5,0.45)_100%)] z-20" />
 
         {/* Bottom blend transition into Footer */}
-        <div className="absolute bottom-0 left-0 right-0 h-44 bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent z-20" />
+        <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent z-20" />
       </div>
     </div>
   );

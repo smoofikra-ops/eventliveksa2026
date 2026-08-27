@@ -20,6 +20,7 @@ import {
 import { StorySection } from './components/cinematic/StorySection';
 import { cinematicScenes } from './data/cinematicScenes';
 import { CinematicBackground } from './components/cinematic/CinematicBackground';
+import { UpperCinematicBackground } from './components/cinematic/UpperCinematicBackground';
 import { ActiveSceneProvider, useActiveScene } from './hooks/useActiveScene';
 
 import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
@@ -43,12 +44,12 @@ export const getVideoEmbedUrl = (url?: string, autoplay = true) => {
   if (!url) return '';
   if (url.includes('drive.google.com')) {
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (match) return `https://drive.google.com/file/d/${match[1]}/preview?autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}&playsinline=1`;
+    if (match) return `https://drive.google.com/file/d/${match[1]}/preview?autoplay=${autoplay ? 1 : 0}&mute=0&playsinline=1`;
   }
   const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
   const match = url.match(ytRegExp);
   if (match && match[2].length === 11) {
-    return `https://www.youtube.com/embed/${match[2]}?autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}&playsinline=1&loop=1&playlist=${match[2]}&controls=${autoplay ? 0 : 1}&showinfo=0&rel=0&iv_load_policy=3`;
+    return `https://www.youtube.com/embed/${match[2]}?autoplay=${autoplay ? 1 : 0}&playsinline=1&rel=0&enablejsapi=1`;
   }
   return url;
 };
@@ -983,18 +984,28 @@ const Services = ({ services }: { services: Service[] }) => {
                   <iframe
                     src={getVideoEmbedUrl(currentVideoUrl, true)}
                     className="w-full h-full pointer-events-auto"
-                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
                     allowFullScreen
-                    loading="lazy"
+                    loading="eager"
                   ></iframe>
                 ) : (
                   <video
                     src={getDirectVideoUrl(currentVideoUrl)}
                     autoPlay
-                    muted
                     controls
                     playsInline
+                    preload="auto"
                     className="w-full h-full object-contain pointer-events-auto"
+                    onCanPlay={(e) => {
+                      const v = e.currentTarget;
+                      const p = v.play();
+                      if (p !== undefined) {
+                        p.catch(() => {
+                          v.muted = true;
+                          v.play().catch(() => {});
+                        });
+                      }
+                    }}
                   ></video>
                 )
               ) : (
@@ -1418,19 +1429,29 @@ const Portfolio = ({ works }: { works: Work[] }) => {
                   <iframe 
                     src={getVideoEmbedUrl(selectedWork.videoUrl, true)}
                     className="w-full h-full pointer-events-auto"
-                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
                     allowFullScreen
-                    loading="lazy"
+                    loading="eager"
                   ></iframe>
                 ) : (
                   <video 
                     src={getDirectVideoUrl(selectedWork.videoUrl!)} 
                     autoPlay 
-                    muted
                     controls 
                     playsInline
+                    preload="auto"
                     poster={selectedWork.img}
                     className="w-full h-full object-contain bg-black pointer-events-auto"
+                    onCanPlay={(e) => {
+                      const v = e.currentTarget;
+                      const p = v.play();
+                      if (p !== undefined) {
+                        p.catch(() => {
+                          v.muted = true;
+                          v.play().catch(() => {});
+                        });
+                      }
+                    }}
                   />
                 )
               ) : (
@@ -2892,12 +2913,17 @@ export default function App() {
       </AnimatePresence>
 
       <main role="main" className="relative">
-        {/* Upper Sections - Untouched: Hero, Statistics, Featured Services */}
+        {/* Chapter 0: Hero Section - Untouched */}
         <Hero videoUrl={data.heroVideoUrl} onQuoteClick={() => setIsQuoteOpen(true)} />
-        <StatsSection />
-        <Services services={data.services} />
 
-        {/* Lower Sections - Cinematic Video Storytelling Environment (Portfolio -> Map) */}
+        {/* Chapter 1: Upper Cinematic Video Storytelling (Statistics -> Featured Services) */}
+        <div id="upper-cinematic-zone" className="relative z-0">
+          <UpperCinematicBackground />
+          <StatsSection />
+          <Services services={data.services} />
+        </div>
+
+        {/* Chapter 2 & Chapter 3: Lower Cinematic Video Storytelling (Portfolio -> FAQ -> Process -> Testimonials -> Contact -> Map) */}
         <div id="lower-cinematic-zone" className="relative z-0">
           <CinematicBackground />
           <Portfolio works={data.works} />
