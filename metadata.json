@@ -1,5 +1,6 @@
 {
   "name": "Test: EventLive - نوثق لحظتك",
   "description": "منصة احترافية لخدمات التصوير الفوتوغرافي والفيديو والبث المباشر للمهرجانات والمؤتمرات في المملكة العربية السعودية.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
