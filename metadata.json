@@ -1,6 +1,6 @@
 {
-  "name": "Test: EventLive - نوثق لحظتك",
-  "description": "منصة احترافية لخدمات التصوير الفوتوغرافي والفيديو والبث المباشر للمهرجانات والمؤتمرات في المملكة العربية السعودية.",
+  "name": "EventLive KSA - هوية اليوم الوطني السعودي 96",
+  "description": "توثيق وتصوير وإنتاج بصري وبث مباشر لاحتفالات وفعاليات اليوم الوطني السعودي 96 في كافة مناطق المملكة العربية السعودية.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

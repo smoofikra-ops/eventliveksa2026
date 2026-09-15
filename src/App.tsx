@@ -14,14 +14,18 @@ import {
   Monitor, Smartphone, Tablet, Watch, Play, Pause, X, Maximize2,
   Mic, Speaker, Film, Tv, Scissors, PenTool, Brush, Palette, Layers, Database, Cloud, Lock, Unlock,
   Key, Shield, Bell, Calendar, Clock, Search, Filter, Wrench, ShoppingCart, CreditCard,
-  Truck, Plane, Train, Bike, Car, Anchor, Sun, Moon, CloudRain, Wind, Snowflake, Flame, Droplet, Languages, Volume2, VolumeX, Ghost, Menu
+  Truck, Plane, Train, Bike, Car, Anchor, Sun, Moon, CloudRain, Wind, Snowflake, Flame, Droplet, Languages, Volume2, VolumeX, Ghost, Menu, Flag
 } from "lucide-react";
 
 import { StorySection } from './components/cinematic/StorySection';
 import { cinematicScenes } from './data/cinematicScenes';
 import { CinematicBackground } from './components/cinematic/CinematicBackground';
 import { UpperCinematicBackground } from './components/cinematic/UpperCinematicBackground';
+import { NationalDay96Section } from './components/NationalDay96Section';
 import { ActiveSceneProvider, useActiveScene } from './hooks/useActiveScene';
+import { useAppTheme } from './themeConfig';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
+import { Recurring96Motif, SaudiEmblem, NationalDay96Badge, SaduPatternDivider } from './components/NationalEmblem';
 
 import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { useLanguage } from "./LanguageContext";
@@ -470,6 +474,7 @@ const ThemeToggle = () => {
 
 const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: () => void, isAdminMode: boolean, onQuoteClick: () => void }) => {
   const { language, setLanguage, t } = useLanguage();
+  const { isND96 } = useAppTheme();
   const [isOpen, setIsOpen] = useState(false);
   const { activeSceneId } = useActiveScene();
   
@@ -480,6 +485,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
 
   const navLinks = [
     { label: t('nav.home'), href: '#home', icon: <Camera className="w-5 h-5" /> },
+    ...(isND96 ? [{ label: language === 'ar' ? 'اليوم الوطني 96' : 'National Day 96', href: '#national-day-96', icon: <Flag className="w-5 h-5 text-emerald-400" /> }] : []),
     { label: t('nav.services'), href: '#services', icon: <Layout className="w-5 h-5" /> },
     { label: t('nav.portfolio'), href: '#portfolio', icon: <Play className="w-5 h-5" /> },
     { label: t('nav.faq'), href: '#faq', icon: <MessageCircle className="w-5 h-5" /> },
@@ -525,7 +531,8 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
           </ul>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ThemeSwitcher compact />
           <button 
             onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
             className="px-4 py-2 rounded-full bg-bdark:/5 hover:bg-black/10 dark:hover:/10 transition-colors font-bold text-sm"
@@ -622,6 +629,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
 
         <div className="flex flex-col gap-4 mt-8 pt-8 border-t border-white/10">
           <div className="flex items-center justify-between">
+            <ThemeSwitcher compact />
             <button 
               onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
               className="px-4 py-2 rounded-full bg-bdark:/5 font-bold hover:bg-black/10 dark:hover:/10 transition-colors"
@@ -676,6 +684,7 @@ const Counter = ({ value, duration = 2, suffix = "" }: { value: number, duration
 
 const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () => void }) => {
   const { t, language } = useLanguage();
+  const { isND96 } = useAppTheme();
   const [isMuted, setIsMuted] = useState(true);
 
   // If videoUrl is provided from config, use it. Otherwise use a fallback image.
@@ -700,6 +709,13 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[#050505]/90"></div>
       </div>
 
+      {/* Atmospheric ND96 motif watermark */}
+      {isND96 && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 select-none overflow-hidden">
+          <Recurring96Motif opacity={0.06} size="text-[340px] md:text-[520px]" />
+        </div>
+      )}
+
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-10 md:py-20 flex-1 flex flex-col justify-center items-center text-center">
         <motion.div 
@@ -709,33 +725,75 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
           className="max-w-4xl flex flex-col items-center" >
 
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-amber-500 md:text-amber-400 font-black mb-8" style={{ fontSize: "10px" }}
-          >
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-            {t('hero.badge')}
-          </motion.div>
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-amber-500 md:text-amber-400 font-black" style={{ fontSize: "10px" }}
+            >
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+              {t('hero.badge')}
+            </motion.div>
+
+            {isND96 && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.25 }}
+              >
+                <NationalDay96Badge />
+              </motion.div>
+            )}
+          </div>
           
           <CustomHeroSequence />
           
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 relative z-10 mt-6" >
-            <motion.button 
-              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(255,138,0,0.5)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onQuoteClick} 
-              className="btn-primary text-base md:text-lg px-8 py-4 md:px-10 md:py-5 relative w-full sm:w-auto" >
-              {t('hero.cta')}
-            </motion.button>
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => document.getElementById('portfolio')?.scrollIntoView()} 
-              className="btn-glass text-base md:text-lg px-8 py-4 md:px-10 md:py-5 w-full sm:w-auto text-center" >
-              {t('hero.portfolio')}
-            </motion.button>
+            {isND96 ? (
+              <>
+                <motion.a 
+                  href="#national-day-96"
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 35px rgba(0,108,53,0.6)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 md:px-10 md:py-5 rounded-full bg-gradient-to-r from-[#006C35] via-[#028A45] to-[#006C35] border border-[#D4AF37]/60 text-white font-black text-base md:text-lg flex items-center justify-center gap-2.5 shadow-[0_0_25px_rgba(0,108,53,0.5)] hover:border-[#D4AF37] transition-all cursor-pointer w-full sm:w-auto"
+                >
+                  <span className="text-xl">🇸🇦</span>
+                  <span>{language === 'ar' ? 'باقات اليوم الوطني 96' : 'National Day 96 Packages'}</span>
+                </motion.a>
+                <motion.button 
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(255,138,0,0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onQuoteClick} 
+                  className="btn-primary text-base md:text-lg px-8 py-4 md:px-10 md:py-5 relative w-full sm:w-auto" >
+                  {language === 'ar' ? 'اطلب تغطية فعاليتك' : t('hero.cta')}
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' })} 
+                  className="btn-glass text-base md:text-lg px-8 py-4 md:px-10 md:py-5 w-full sm:w-auto text-center" >
+                  {t('hero.portfolio')}
+                </motion.button>
+              </>
+            ) : (
+              <>
+                <motion.button 
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(255,138,0,0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onQuoteClick} 
+                  className="btn-primary text-base md:text-lg px-8 py-4 md:px-10 md:py-5 relative w-full sm:w-auto" >
+                  {t('hero.cta')}
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' })} 
+                  className="btn-glass text-base md:text-lg px-8 py-4 md:px-10 md:py-5 w-full sm:w-auto text-center" >
+                  {t('hero.portfolio')}
+                </motion.button>
+              </>
+            )}
           </div>
         </motion.div>
           </div>
@@ -745,11 +803,24 @@ const Hero = ({ videoUrl, onQuoteClick }: { videoUrl?: string, onQuoteClick: () 
 
 const StatsSection = () => {
   const { t, language } = useLanguage();
+  const { isND96 } = useAppTheme();
   return (
-    <SectionWrapper id="stats" className=" py-8 md:py-16 ">
-      <div className="max-w-4xl mx-auto">
+    <SectionWrapper id="stats" className=" py-8 md:py-16 relative overflow-hidden">
+      {isND96 && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 select-none overflow-hidden">
+          <Recurring96Motif opacity={0.04} size="text-[260px] md:text-[380px]" />
+        </div>
+      )}
+      <div className="max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-10 md:mb-16">
           <ScrollReveal type="fade-down" distance={20}>
+            {isND96 && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#006C35]/20 border border-[#006C35]/40 text-emerald-300 text-xs font-bold mb-4">
+                <span>🇸🇦 الفصل الأول</span>
+                <span className="text-white/40">•</span>
+                <span>{language === 'ar' ? 'لحظات تصنع ذاكرة الوطن' : 'Moments Shaping the Nation\'s Memory'}</span>
+              </div>
+            )}
             <h2 className="text-3xl md:text-[40px] font-semibold text-white mb-6 md:mb-8 title-accent-center">
               {t("stats.title")}
             </h2>
@@ -1087,6 +1158,7 @@ const PortfolioMediaContent = ({ w, isIframeVideo, getVideoEmbedUrl, selectedWor
 
 const Portfolio = ({ works }: { works: Work[] }) => {
     const { t, language } = useLanguage();
+  const { isND96 } = useAppTheme();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isGridOpen, setIsGridOpen] = useState(false);
   const [gridPage, setGridPage] = useState(0);
@@ -1184,6 +1256,13 @@ const Portfolio = ({ works }: { works: Work[] }) => {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
         <div>
           <ScrollReveal type="fade-right" distance={20}>
+            {isND96 && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#006C35]/20 border border-[#006C35]/40 text-emerald-300 text-xs font-bold mb-4">
+                <span>🇸🇦 الفصل الثاني</span>
+                <span className="text-white/40">•</span>
+                <span>{language === 'ar' ? 'من قلب الحدث' : 'From the Heart of the Event'}</span>
+              </div>
+            )}
             <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 title-accent text-white truncate w-full max-w-full block">{t('portfolio.title')}</h2>
           </ScrollReveal>
           <ScrollReveal type="fade-up" delay={0.2} distance={20}>
@@ -1857,6 +1936,7 @@ const Testimonials = () => {
 
 const Contact = () => {
   const { t, language } = useLanguage();
+  const { isND96 } = useAppTheme();
   const [formData, setFormData] = useState(() => {
     try {
       const saved = localStorage.getItem('contactFormDraft');
@@ -1957,8 +2037,21 @@ const Contact = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <ScrollReveal type="fade-right" distance={30}>
-            <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent text-white truncate w-full max-w-full block">{t("contact.title")}</h2>
-            <p className="text-white/90 mb-12 text-base md:text-lg">{t('contact.formDesc')}</p>
+            {isND96 && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#006C35]/20 border border-[#006C35]/40 text-emerald-300 text-xs font-bold mb-4">
+                <span>🇸🇦 الفصل الثالث</span>
+                <span className="text-white/40">•</span>
+                <span>{language === 'ar' ? 'نوثق عزّ الوطن' : 'Documenting the Nation\'s Pride'}</span>
+              </div>
+            )}
+            <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold mb-6 md:mb-8 title-accent text-white truncate w-full max-w-full block">
+              {isND96 ? (language === 'ar' ? 'جاهزين نوثق فعاليتك في اليوم الوطني 96؟' : 'Ready to Document Your National Day 96 Event?') : t("contact.title")}
+            </h2>
+            <p className="text-white/90 mb-12 text-base md:text-lg">
+              {isND96 
+                ? (language === 'ar' ? 'نوفر لك فرق تصوير سينمائي، وحدات بث تلفزيوني خارجي، واستديوهات فورية بهوية اليوم الوطني 96 في كافة مناطق المملكة.' : t('contact.formDesc'))
+                : t('contact.formDesc')}
+            </p>
             
             <div className="space-y-8">
               <div className="flex items-start gap-4">
@@ -2024,6 +2117,7 @@ const Contact = () => {
                 <div>
                   <label className="block text-sm font-bold text-white/80 mb-2">{t('contact.serviceLabel')}</label>
                   <select name="serviceRequested" value={formData.serviceRequested} onChange={handleChange} className="w-full bg-bdark:/5 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors text-white focus: dark:focus:bg-black/40 shadow-sm appearance-none">
+                    <option value="🇸🇦 باقة توثيق اليوم الوطني السعودي 96" className="text-black">🇸🇦 باقة توثيق اليوم الوطني السعودي 96</option>
                     <option value={t("contact.serviceVideo")} className="text-black">{t('contact.serviceVideo')}</option>
                     <option value={t("contact.servicePhoto")} className="text-black">{t('contact.servicePhoto')}</option>
                     <option value={t("contact.serviceLive")} className="text-black">{t('contact.serviceLive')}</option>
@@ -2059,6 +2153,7 @@ const Contact = () => {
 
 const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
   const { t, language } = useLanguage();
+  const { isND96 } = useAppTheme();
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -2074,9 +2169,49 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
         <div className="absolute top-0 -left-1/4 w-1/2 h-full bg-amber-500/20 blur-[120px] rounded-full mix-blend-screen animate-bg-pan" style={{ animationDuration: '15s' }}></div>
         <div className="absolute top-0 -right-1/4 w-1/2 h-full bg-orange-600/20 blur-[120px] rounded-full mix-blend-screen animate-bg-pan" style={{ animationDuration: '20s', animationDirection: 'reverse' }}></div>
         <div className="absolute -bottom-1/2 left-1/4 w-1/2 h-full bg-yellow-500/10 blur-[100px] rounded-full mix-blend-screen animate-bg-pan" style={{ animationDuration: '25s' }}></div>
+        {isND96 && (
+          <div className="absolute top-0 left-1/4 w-1/2 h-full bg-emerald-600/15 blur-[140px] rounded-full mix-blend-screen pointer-events-none" />
+        )}
       </div>
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
+        {/* ND96 Grand Finale Commemorative Section */}
+        {isND96 && (
+          <div className="mb-14 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#006C35]/30 via-[#004d25]/50 to-[#006C35]/30 border border-[#D4AF37]/40 backdrop-blur-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+            <div className="absolute -right-6 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none select-none font-black text-9xl text-white font-mono">
+              96
+            </div>
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#006C35] to-[#004d25] border border-[#D4AF37]/60 flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                <SaudiEmblem className="w-8 h-8 text-[#D4AF37]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[#D4AF37] font-bold text-xs tracking-wider uppercase">
+                    {language === 'ar' ? 'اليوم الوطني السعودي 96' : 'Saudi National Day 96'}
+                  </span>
+                  <span className="text-white/40">•</span>
+                  <span className="text-emerald-300 font-bold text-xs">
+                    {language === 'ar' ? 'عزّنا بطبعنا' : 'Our Pride is Our Nature'}
+                  </span>
+                </div>
+                <h3 className="text-lg sm:text-2xl font-black text-white">
+                  {language === 'ar' ? 'Event Live — نوثق عزّ الوطن وفخره' : 'Event Live — Documenting the Nation\'s Pride'}
+                </h3>
+              </div>
+            </div>
+            <div className="relative z-10 flex items-center gap-3">
+              <a
+                href="#national-day-96"
+                className="px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2"
+              >
+                <span>🇸🇦</span>
+                <span>{language === 'ar' ? 'استعرض باقات 96' : 'Explore 96 Packages'}</span>
+              </a>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12 mb-16">
           <div className="mb-4 md:mb-0">
             <a href="#home" className="flex items-center gap-2 mb-6">
@@ -2249,6 +2384,7 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
 const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: AppData) => void, onClose: () => void }) => {
   const [localData, setLocalData] = useState<AppData>(data);
   const [activeTab, setActiveTab] = useState('services');
+  const { currentTheme, setTheme, isND96 } = useAppTheme();
 
   const handleUpdateServiceIcon = (id: string, iconName: string) => {
     setLocalData({
@@ -2304,13 +2440,14 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
         
         <div className="flex flex-1 overflow-hidden">
           <div className="w-64 border-l lack/10 dark:border-white/10 p-4 flex flex-col gap-2 overflow-y-auto">
-            {['services', 'portfolio', 'social', 'hero'].map(tab => (
+            {['services', 'portfolio', 'social', 'hero', 'nd96'].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)} className={`text-start px-4 py-3 rounded-lg font-bold transition-colors ${activeTab === tab ? 'bg-amber-500 text-black' : 'text-white/90 hover:bg-bdark:hover:bg-white/5'}`}>
                 {tab === 'services' && 'الخدمات'}
                 {tab === 'portfolio' && 'الأعمال'}
                 {tab === 'social' && 'التواصل الاجتماعي'}
                 {tab === 'hero' && 'الرئيسية'}
-                </button>
+                {tab === 'nd96' && '🇸🇦 هوية اليوم الوطني 96'}
+              </button>
             ))}
           </div>
           
@@ -2403,6 +2540,62 @@ const AdminPage = ({ data, onSave, onClose }: { data: AppData, onSave: (data: Ap
                 </div>
               </div>
             )}
+
+            {activeTab === 'nd96' && (
+              <div className="space-y-6">
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-[#006C35]/20 to-[#004d25]/40 border border-[#006C35]/40">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-3xl">🇸🇦</span>
+                    <div>
+                      <h3 className="text-xl font-black text-white">هوية اليوم الوطني السعودي 96</h3>
+                      <p className="text-emerald-300 text-sm font-semibold">شعار الحملة: "عزّنا بطبعنا"</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/80 text-sm mb-6 leading-relaxed">
+                    يمكنك تفعيل أو إلغاء تفعيل هوية اليوم الوطني 96 بنقرة واحدة. عند التفعيل، تتحول واجهة الموقع لتبرز قسم اليوم الوطني، أوسمة الفصول، الألوان الوطنية (الأخضر والذهبي)، وشريط الإعلانات الوطني، مع إمكانية العودة للثيم الأصلي في أي لحظة.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setTheme('EVENT_LIVE_ND96')}
+                      className={`p-4 rounded-xl border text-start transition-all ${
+                        isND96
+                          ? 'bg-[#006C35] border-[#D4AF37] shadow-[0_0_20px_rgba(0,108,53,0.5)] text-white'
+                          : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-base flex items-center gap-2">
+                          <span>🇸🇦</span> هوية اليوم الوطني 96
+                        </span>
+                        {isND96 && <span className="px-2 py-0.5 rounded-full bg-[#D4AF37] text-black text-xs font-black">مفعّل حالياً</span>}
+                      </div>
+                      <p className="text-xs text-white/70">ألوان عزّنا بطبعنا (الأخضر والذهبي)، قسم 96 المخصص، وباقات الاحتفال.</p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTheme('EVENT_LIVE_ORIGINAL')}
+                      className={`p-4 rounded-xl border text-start transition-all ${
+                        !isND96
+                          ? 'bg-amber-500 border-amber-300 shadow-[0_0_20px_rgba(255,138,0,0.4)] text-black'
+                          : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-base flex items-center gap-2">
+                          <span>✨</span> ثيم Event Live الأصلي
+                        </span>
+                        {!isND96 && <span className="px-2 py-0.5 rounded-full bg-black text-amber-400 text-xs font-black">مفعّل حالياً</span>}
+                      </div>
+                      <p className={`text-xs ${!isND96 ? 'text-black/80' : 'text-white/70'}`}>التصميم السينمائي الكلاسيكي مع الألوان البرتقالية والذهبية القياسية.</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -2425,6 +2618,7 @@ const ScrollProgress = () => {
 
 const QuoteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   const { t, language } = useLanguage();
+  const { isND96 } = useAppTheme();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -2562,7 +2756,22 @@ const QuoteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void 
   };
 
   const clientTypes = [{id: 'gov', name: t('client.gov')}, {id: 'company', name: t('client.company')}, {id: 'org', name: t('client.org')}, {id: 'individual', name: t('client.individual')}];
-  const eventTypes = [{id: 'exhibition', name: t('event.exhibition')}, {id: 'festival', name: t('event.festival')}, {id: 'conference', name: t('event.conference')}, {id: 'events', name: t('event.events')}, {id: 'corp', name: t('event.corp')}, {id: 'opening', name: t('event.opening')}, {id: 'national', name: t('event.national')}, {id: 'photography', name: t('event.photography')}, {id: 'realestate', name: t('event.realestate')}, {id: 'ad', name: t('event.ad')}, {id: 'wedding', name: t('event.wedding')}, {id: 'personal', name: t('event.personal')}, {id: 'other', name: t('event.other')}];
+  const eventTypes = [
+    ...(isND96 ? [{id: 'national96', name: language === 'ar' ? '🇸🇦 احتفال اليوم الوطني السعودي 96' : '🇸🇦 Saudi National Day 96 Celebration'}] : []),
+    {id: 'national', name: t('event.national')}, 
+    {id: 'exhibition', name: t('event.exhibition')}, 
+    {id: 'festival', name: t('event.festival')}, 
+    {id: 'conference', name: t('event.conference')}, 
+    {id: 'events', name: t('event.events')}, 
+    {id: 'corp', name: t('event.corp')}, 
+    {id: 'opening', name: t('event.opening')}, 
+    {id: 'photography', name: t('event.photography')}, 
+    {id: 'realestate', name: t('event.realestate')}, 
+    {id: 'ad', name: t('event.ad')}, 
+    {id: 'wedding', name: t('event.wedding')}, 
+    {id: 'personal', name: t('event.personal')}, 
+    {id: 'other', name: t('event.other')}
+  ];
 
   return (
     <div className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4" onClick={onClose}>
@@ -2842,6 +3051,40 @@ const MapSection = () => {
 
 const AnnouncementBanner = () => {
   const { t, language } = useLanguage();
+  const { isND96 } = useAppTheme();
+
+  if (isND96) {
+    return (
+      <div className="hide-on-video transition-all duration-300 fixed top-0 left-0 right-0 h-10 bg-gradient-to-r from-[#004d25] via-[#006C35] to-[#004d25] backdrop-blur-md text-emerald-100 flex items-center overflow-hidden z-[110] shadow-sm border-b border-[#D4AF37]/30">
+        <div className="flex animate-marquee whitespace-nowrap min-w-full" dir="ltr">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className={`flex items-center gap-6 px-4 text-[11px] md:text-xs font-bold text-white/95 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+              <span className="flex items-center gap-1.5 text-[#D4AF37]">
+                <span>🇸🇦</span> {language === 'ar' ? 'اليوم الوطني السعودي 96' : 'Saudi National Day 96'}
+              </span>
+              <span className="text-white/40">•</span>
+              <span className="text-emerald-200">
+                {language === 'ar' ? 'عزّنا بطبعنا' : 'Our Pride is Our Nature'}
+              </span>
+              <span className="text-white/40">•</span>
+              <span className="text-white/90">
+                {language === 'ar' ? 'تغطية سينمائية شاملة في كافة مناطق المملكة' : 'Cinematic coverage across all regions'}
+              </span>
+              <span className="text-white/40">•</span>
+              <span className="text-yellow-300">
+                {language === 'ar' ? 'بث مباشر 4K وطائرات درون مرخصة' : '4K Live Broadcast & Drone Crew'}
+              </span>
+              <span className="text-white/40">•</span>
+              <span className="text-emerald-300">
+                {language === 'ar' ? 'استوديوهات تصوير فورية بهوية 96' : 'Instant 96 Photo Booths'}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="hide-on-video transition-all duration-300 fixed top-0 left-0 right-0 h-10 bg-gradient-to-r from-amber-50 via-white to-amber-50 dark:from-amber-950/40 dark:via-black/60 dark:to-amber-950/40 backdrop-blur-md animate-gradient-x text-amber-900 dark:text-amber-100/80 flex items-center overflow-hidden z-[110] shadow-sm border-b border-amber-200/30 dark:border-white/5">
       <div className="flex animate-marquee whitespace-nowrap min-w-full" dir="ltr">
@@ -2915,6 +3158,9 @@ export default function App() {
       <main role="main" className="relative">
         {/* Chapter 0: Hero Section - Untouched */}
         <Hero videoUrl={data.heroVideoUrl} onQuoteClick={() => setIsQuoteOpen(true)} />
+
+        {/* Chapter 0.5: Saudi National Day 96 Identity Section */}
+        <NationalDay96Section onQuoteClick={() => setIsQuoteOpen(true)} />
 
         {/* Chapter 1: Upper Cinematic Video Storytelling (Statistics -> Featured Services) */}
         <div id="upper-cinematic-zone" className="relative z-0">
