@@ -13,12 +13,6 @@ export const cinematicScenes: CinematicScene[] = [
     headerTheme: 'dark'
   },
   {
-    id: 'national-day-96',
-    url: 'https://nmolabs-cdn.b-cdn.net/eventlive/website/home/sections/Card-service/image%20(2).png',
-    accentColor: '#006C35',
-    headerTheme: 'dark'
-  },
-  {
     id: 'partners',
     url: 'https://res.cloudinary.com/ozd726ro/image/upload/v1785439543/FE4DE51C-3433-456F-9CB4-6A49A98E8832_mvwcrb.png',
     accentColor: '#d4af37',
