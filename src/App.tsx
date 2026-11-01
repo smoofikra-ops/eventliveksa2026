@@ -480,10 +480,10 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
   const logoClass = isDarkTheme ? 'brightness-100' : 'brightness-0';
 
   const navLinks = [
-    { label: t('nav.home'), href: '#home', icon: <Camera className="w-5 h-5" /> },
-    { label: t('nav.services'), href: '#services', icon: <Layout className="w-5 h-5" /> },
-    { label: t('nav.portfolio'), href: '#portfolio', icon: <Play className="w-5 h-5" /> },
-    { label: t('nav.faq'), href: '#faq', icon: <MessageCircle className="w-5 h-5" /> },
+    { label: t('nav.home'), href: '/', icon: <Camera className="w-5 h-5" /> },
+    { label: t('nav.services'), href: '/services', icon: <Layout className="w-5 h-5" /> },
+    { label: t('nav.portfolio'), href: '/portfolio', icon: <Play className="w-5 h-5" /> },
+    { label: t('nav.faq'), href: '/faq', icon: <MessageCircle className="w-5 h-5" /> },
     { label: t('nav.contact'), href: '#contact', icon: <Phone className="w-5 h-5" /> }
   ];
 
@@ -495,7 +495,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
       {/* Desktop Navigation */}
       <div className="hide-on-video hidden md:flex fixed top-10 left-0 right-0 z-[90] h-20 items-center px-8 bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-sm transition-all justify-between">
         <div className="w-[100px] xl:w-[200px] flex justify-start items-center">
-          <a href="#home" className="flex items-center">
+          <a href="/" className="flex items-center">
             <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className={`h-10 object-contain transition-all duration-500 ${logoClass}`}  loading="lazy" />
           </a>
         </div>
@@ -551,7 +551,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
       {/* Mobile Navigation Header */}
       <div className="hide-on-video md:hidden fixed top-10 left-0 right-0 z-[100] h-16 flex items-center justify-between px-4 bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-sm">
         <div className="flex-1 flex justify-start">
-          <a href="#home" className="flex items-center">
+          <a href="/" className="flex items-center">
             <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className="h-8 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
           </a>
         </div>
@@ -2081,7 +2081,7 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12 mb-16">
           <div className="mb-4 md:mb-0">
-            <a href="#home" className="flex items-center gap-2 mb-6">
+            <a href="/" className="flex items-center gap-2 mb-6">
               <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className="h-12 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
             </a>
             <p className="text-white/90 mb-6 leading-relaxed">
@@ -2099,10 +2099,10 @@ const Footer = ({ socialLinks }: { socialLinks: SocialLink[] }) => {
             </button>
             <div className={`mt-4 md:mt-0 overflow-hidden transition-all duration-300 ${openSection === 'quickLinks' ? 'max-h-96' : 'max-h-0 md:max-h-full'}`}>
               <HoverLinkGroup id={`footer-group-${Math.random()}`} links={[
-                { label: t("nav.home"), href: "#home" },
-                { label: t("nav.services"), href: "#services" },
-                { label: t("nav.portfolio"), href: "#portfolio" },
-                { label: t("nav.faq"), href: "#faq" }
+                { label: t("nav.home"), href: "/" },
+                { label: t("nav.services"), href: "/services" },
+                { label: t("nav.portfolio"), href: "/portfolio" },
+                { label: t("nav.faq"), href: "/faq" }
               ]} />
             </div>
           </div>
