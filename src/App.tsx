@@ -2876,11 +2876,34 @@ const AnnouncementBanner = () => {
   );
 };
 
+
+const SERVICE_GUIDES = [{"slug":"exhibitions","topics":["تغطية المعارض","التخطيط للتغطية","تصوير الأجنحة والتفاصيل","مخرجات المحتوى"],"reference":["Event Safety Guide","https://www.eventsafetyalliance.org/"]},{"slug":"festivals","topics":["تصوير المهرجانات","تخطيط الحركة والكاميرات","توثيق الجمهور والعروض","مونتاج أبرز اللحظات"],"reference":["Event Safety Guide","https://www.eventsafetyalliance.org/"]},{"slug":"national-events","topics":["تغطية الفعاليات الوطنية","الهوية البصرية للمناسبة","توثيق الفقرات الرسمية","إعداد المحتوى للنشر"],"reference":["هيئة الترفيه السعودية","https://www.gea.gov.sa/"]},{"slug":"opening-ceremonies","topics":["تصوير حفلات الافتتاح","التجهيز قبل الافتتاح","توثيق استقبال الضيوف واللحظة الرئيسية","إنتاج فيديو الافتتاح"],"reference":["Event Safety Alliance","https://www.eventsafetyalliance.org/"]},{"slug":"conferences","topics":["تصوير المؤتمرات","تصوير المتحدثين والجلسات","تسجيل الصوت والعروض","تسليم المواد المصورة"],"reference":["AVIXA – Professional Audiovisual Industry","https://www.avixa.org/"]},{"slug":"corporate-events","topics":["تغطية فعاليات الشركات","تحديد أهداف الاتصال","التصوير وفق الهوية المؤسسية","إنتاج محتوى ما بعد الحدث"],"reference":["AVIXA – Professional Audiovisual Industry","https://www.avixa.org/"]},{"slug":"live-streaming","topics":["خدمات البث المباشر","تخطيط البث واختبار الاتصال","الكاميرات والصوت والتحويل","المراقبة والتسجيل الاحتياطي"],"reference":["SMPTE – Motion Imaging Standards","https://www.smpte.org/"]},{"slug":"commercial-ads","topics":["إنتاج الإعلانات التجارية","الفكرة والسيناريو","التصوير والإضاءة","المونتاج ونسخ النشر"],"reference":["SMPTE – Motion Imaging Standards","https://www.smpte.org/"]}];
+function ServiceGuidePage({ service, guide, allServices }: { service: Service; guide: typeof SERVICE_GUIDES[number]; allServices: Service[] }) {
+  const sections = guide.topics;
+  return <article dir="rtl" className="min-h-screen pt-28 md:pt-36 pb-20 bg-[#0b0b0c] text-white">
+    <div className="max-w-5xl mx-auto px-5 md:px-8">
+      <nav aria-label="مسار التنقل" className="text-sm text-white/70 mb-7"><a href="/" className="hover:text-amber-400">الرئيسية</a> / <a href="/services" className="hover:text-amber-400">الخدمات</a> / {service.title}</nav>
+      <h1 className="text-3xl md:text-5xl font-bold leading-relaxed mb-5">{service.title} في السعودية | إيفنت لايف</h1>
+      <p className="text-lg leading-9 text-white/80 mb-8">{service.desc} نقدم هذا الدليل للتعريف بمراحل العمل والاعتبارات الفنية عند طلب الخدمة، وتحديد المخرجات المناسبة لطبيعة المناسبة واحتياجات العميل.</p>
+      {service.cardBgImage && <img src={getOptimizedImageUrl(service.cardBgImage)} alt={service.title} className="w-full aspect-video object-cover rounded-2xl mb-10" />}
+      <nav aria-label="فهرس الخدمة" className="rounded-2xl border border-amber-500/30 bg-white/5 p-6 mb-10"><h2 className="text-xl font-bold mb-4">محتويات الدليل</h2><ol className="space-y-3 list-decimal list-inside">{sections.map((section,i)=><li key={section}><a className="text-amber-300 hover:underline" href={`#guide-${i+1}`}>{section}</a></li>)}</ol></nav>
+      {sections.map((section,i)=><section id={`guide-${i+1}`} key={section} className="mb-10 scroll-mt-28"><h2 className="text-2xl font-bold text-amber-300 mb-4">{section}</h2><p className="text-white/80 leading-9">{i===0 ? `تبدأ خدمة ${service.title} بتحديد طبيعة الحدث وموقعه ومدته والجمهور المستهدف، ثم الاتفاق على أسلوب التغطية والمواد المطلوب تسليمها. يساعد هذا التخطيط على توزيع الوقت والموارد بشكل مناسب دون افتراض متطلبات موحدة لجميع الفعاليات.` : i===1 ? `تتطلب مرحلة ${section} تنسيقًا مسبقًا مع الجهة المنظمة، ومراجعة مواقع التصوير والإضاءة والصوت ومسارات الحركة والتصاريح عند الحاجة. تُحدد التجهيزات الفنية بعد معاينة متطلبات المشروع.` : i===2 ? `يركز تنفيذ ${section} على توثيق اللحظات الأساسية بجودة متسقة، مع مراعاة تسلسل الحدث وسلامة فريق العمل والخصوصية وحقوق استخدام المواد المصورة. وتختلف خطة التصوير بحسب حجم الفعالية.` : `تشمل مرحلة ${section} مراجعة الملفات وجودة الصوت والصورة، ثم تجهيز النسخ المطلوبة للاستخدام على الموقع أو منصات التواصل أو الأرشفة. تُحدد الصيغ والمدة والجدول الزمني ضمن نطاق العمل المتفق عليه.`}</p></section>)}
+      <section className="mb-10 rounded-2xl bg-white/5 border border-white/10 p-6"><h2 className="text-2xl font-bold mb-4">أسئلة شائعة</h2><h3 className="font-bold mb-2">كيف يتم تحديد تكلفة {service.title}؟</h3><p className="text-white/80 leading-8 mb-5">تعتمد التكلفة على مدة العمل والموقع وعدد أفراد الفريق والتجهيزات المطلوبة ونوع المخرجات؛ ويُعد عرض سعر مخصص بعد معرفة التفاصيل.</p><h3 className="font-bold mb-2">متى يجب التنسيق قبل الفعالية؟</h3><p className="text-white/80 leading-8">يُفضل التواصل مبكرًا لإتاحة وقت كافٍ للتخطيط والمعاينة والتنسيق، وتختلف المهلة اللازمة حسب حجم الفعالية.</p></section>
+      <section className="mb-10"><h2 className="text-xl font-bold mb-3">مرجع فني للاستزادة</h2><a href={guide.reference[1]} target="_blank" rel="noopener noreferrer" className="text-amber-300 underline">{guide.reference[0]}</a><p className="text-sm text-white/60 mt-2">مرجع عام في المجال، وليس شهادة اعتماد أو إثبات تنفيذ من الجهة المذكورة.</p></section>
+      <h2 className="text-xl font-bold mb-4">خدمات ذات صلة</h2><div className="flex flex-wrap gap-3 mb-9">{allServices.filter(x=>x.id!==service.id).slice(0,4).map(x=><a key={x.id} href={`/services/${SERVICE_GUIDES[Number(x.id)-1]?.slug}`} className="rounded-xl border border-white/20 px-4 py-2 hover:border-amber-400">{x.title}</a>)}</div>
+      <a href="/#contact" className="inline-block bg-amber-500 text-black rounded-xl px-7 py-4 font-bold">اطلب عرض سعر للخدمة</a>
+    </div>
+  </article>;
+}
+function ServicesDirectoryPage({ services }: { services: Service[] }) {return <section dir="rtl" className="min-h-screen pt-28 md:pt-36 pb-20 bg-[#0b0b0c] text-white"><div className="max-w-6xl mx-auto px-5"><a href="/" className="text-amber-300 text-sm">الرئيسية</a><h1 className="text-4xl md:text-5xl font-bold mt-6 mb-5">خدمات تصوير وتغطية الفعاليات في السعودية</h1><p className="text-white/75 leading-9 mb-10 max-w-3xl">تعرف على خدمات إيفنت لايف في التصوير والإنتاج المرئي والبث المباشر. اختر الخدمة لقراءة دليلها ومراحل التنفيذ وطلب عرض مناسب.</p><div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{services.map((s,i)=><article key={s.id} className="rounded-2xl border border-white/15 bg-white/5 overflow-hidden"><a href={`/services/${SERVICE_GUIDES[i]?.slug}`}><img src={getOptimizedImageUrl(s.cardBgImage)} alt={s.title} loading="lazy" className="w-full aspect-video object-cover"/><div className="p-5"><h2 className="text-xl font-bold mb-3">{s.title}</h2><p className="text-white/75 leading-7 mb-4">{s.desc}</p><span className="text-amber-300 font-bold">تفاصيل الخدمة ←</span></div></a></article>)}</div></div></section>}
+
 export default function App() {
   const { t, language } = useLanguage();
   const [data, setData] = useState<AppData>(INITIAL_DATA);
   const route = typeof window !== "undefined" ? window.location.pathname.replace(/\/$/, "") || "/" : "/";
   const isPortfolioPage = route === "/portfolio";
+  const isServicesPage = route === "/services";
+  const guideIndex = SERVICE_GUIDES.findIndex(g => route === `/services/${g.slug}`);
   const isFaqPage = route === "/faq";
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -2945,7 +2968,7 @@ export default function App() {
       </AnimatePresence>
 
       <main role="main" className="relative">
-        {(isPortfolioPage || isFaqPage) ? (
+        {isServicesPage ? <ServicesDirectoryPage services={data.services} /> : guideIndex >= 0 ? <ServiceGuidePage service={data.services[guideIndex]} guide={SERVICE_GUIDES[guideIndex]} allServices={data.services} /> : (isPortfolioPage || isFaqPage) ? (
           <div className="relative pt-28 md:pt-36 min-h-screen">
             <div className="max-w-7xl mx-auto px-6 pb-6" dir="rtl">
               <a href="/" className="text-amber-400 hover:underline text-sm">الرئيسية / {isPortfolioPage ? "أعمالنا" : "الأسئلة الشائعة"}</a>
