@@ -2879,8 +2879,23 @@ const AnnouncementBanner = () => {
 export default function App() {
   const { t, language } = useLanguage();
   const [data, setData] = useState<AppData>(INITIAL_DATA);
+  const route = typeof window !== "undefined" ? window.location.pathname.replace(/\/$/, "") || "/" : "/";
+  const isPortfolioPage = route === "/portfolio";
+  const isFaqPage = route === "/faq";
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  useEffect(() => {
+    const canonicalUrl = `https://www.eventliveksa.com${route === "/" ? "/" : route}`;
+    const title = isPortfolioPage ? "أعمالنا ومشاريع التصوير | EventLive KSA" : isFaqPage ? "الأسئلة الشائعة عن خدمات التصوير والبث | EventLive KSA" : "EventLive KSA - تغطية وتصوير الفعاليات والمؤتمرات والبث المباشر";
+    const description = isPortfolioPage ? "استعرض نماذج أعمال إيفنت لايف في تصوير الفعاليات والمؤتمرات والمعارض في السعودية." : isFaqPage ? "إجابات الأسئلة الشائعة حول خدمات إيفنت لايف لتصوير الفعاليات والبث المباشر في السعودية." : "إيفنت لايف المتخصصة في تغطية وتصوير الفعاليات والمؤتمرات والمعارض والإنتاج المرئي والبث المباشر في الرياض وكافة مناطق المملكة العربية السعودية.";
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonicalUrl);
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", canonicalUrl);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+  }, [route, isPortfolioPage, isFaqPage]);
 
   const handleSaveData = (newData: AppData) => {
     setData(newData);
@@ -2930,6 +2945,17 @@ export default function App() {
       </AnimatePresence>
 
       <main role="main" className="relative">
+        {(isPortfolioPage || isFaqPage) ? (
+          <div className="relative pt-28 md:pt-36 min-h-screen">
+            <div className="max-w-7xl mx-auto px-6 pb-6" dir="rtl">
+              <a href="/" className="text-amber-400 hover:underline text-sm">الرئيسية / {isPortfolioPage ? "أعمالنا" : "الأسئلة الشائعة"}</a>
+              <h1 className="text-3xl md:text-5xl font-bold mt-6 mb-4 text-white">{isPortfolioPage ? "أعمالنا ومشاريعنا" : "الأسئلة الشائعة"}</h1>
+              <p className="text-white/80 max-w-3xl">{isPortfolioPage ? "نماذج من أعمالنا في تغطية وتصوير الفعاليات والمؤتمرات والمعارض." : "إجابات لأبرز الاستفسارات حول خدمات التصوير والإنتاج والبث المباشر."}</p>
+            </div>
+            {isPortfolioPage ? <Portfolio works={data.works} /> : <FAQ />}
+          </div>
+        ) : (
+          <>
         {/* Chapter 0: Hero Section */}
         <Hero videoUrl={data.heroVideoUrl} onQuoteClick={() => setIsQuoteOpen(true)} />
 
@@ -2950,6 +2976,8 @@ export default function App() {
           <Contact />
           <MapSection />
         </div>
+          </>
+        )}
       </main>
       <Footer socialLinks={data.socialLinks} />
       <FloatingActionButtons />
