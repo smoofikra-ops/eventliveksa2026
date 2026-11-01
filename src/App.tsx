@@ -2939,6 +2939,11 @@ export default function App() {
           <UpperCinematicBackground />
           <StatsSection />
           <Services services={data.services} />
+          <div className="relative z-20 text-center py-6 px-4">
+            <a href="/services" className="inline-flex items-center justify-center rounded-xl border border-amber-400/60 bg-amber-500 px-6 py-3 font-bold text-black hover:bg-amber-400 transition-colors">
+              اكتشف تفاصيل خدماتنا
+            </a>
+          </div>
         </div>
 
         {/* Chapter 2 & Chapter 3: Lower Cinematic Video Storytelling (Portfolio -> FAQ -> Process -> Testimonials -> Contact -> Map) */}
