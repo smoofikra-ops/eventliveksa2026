@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://eventliveksa.com/sitemap.xml
+Sitemap: https://www.eventliveksa.com/sitemap.xml
