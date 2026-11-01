@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/portfolio",
+      "destination": "/"
+    },
+    {
+      "source": "/faq",
+      "destination": "/"
+    }
+  ]
+}
