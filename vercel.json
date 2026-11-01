@@ -1,12 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/portfolio",
-      "destination": "/"
-    },
-    {
-      "source": "/faq",
-      "destination": "/"
+      "source": "/((?!api/|assets/|.*\\.).*)",
+      "destination": "/index.html"
     }
   ]
 }
