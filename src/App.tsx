@@ -278,7 +278,6 @@ const INITIAL_DATA: AppData = {
   partners: [
     ],
   socialLinks: [
-    { platform: 'twitter', url: 'https://twitter.com/eventliveksa' },
     { platform: 'instagram', url: 'https://instagram.com/eventliveksa' },
     { platform: 'linkedin', url: 'https://linkedin.com/company/eventliveksa' },
     { platform: 'snapchat', url: 'https://snapchat.com/add/eventliveksa' },
