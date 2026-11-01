@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import SiteSearch from './components/SiteSearch';
+import { MediaServicePage, ContactPage } from './components/EditorialServicePages';
 import { StorySection } from './components/cinematic/StorySection';
 import { cinematicScenes } from './data/cinematicScenes';
 import { CinematicBackground } from './components/cinematic/CinematicBackground';
@@ -2928,6 +2929,9 @@ export default function App() {
   const route = typeof window !== "undefined" ? window.location.pathname.replace(/\/$/, "") || "/" : "/";
   const isPortfolioPage = route === "/portfolio";
   const isServicesPage = route === "/services";
+  const isPhotographyPage = route === "/services/photography";
+  const isVideographyPage = route === "/services/videography";
+  const isContactPage = route === "/contact";
   const guideIndex = SERVICE_GUIDES.findIndex(g => route === `/services/${g.slug}`);
   const isFaqPage = route === "/faq";
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
@@ -2935,8 +2939,8 @@ export default function App() {
 
   useEffect(() => {
     const canonicalUrl = `https://www.eventliveksa.com${route === "/" ? "/" : route}`;
-    const title = guideIndex >= 0 ? `${data.services[guideIndex]?.title || "خدمات الفعاليات"} في السعودية | دليل إيفنت لايف` : isPortfolioPage ? "أعمالنا ومشاريع التصوير | EventLive KSA" : isFaqPage ? "الأسئلة الشائعة عن خدمات التصوير والبث | EventLive KSA" : "EventLive KSA - تغطية وتصوير الفعاليات والمؤتمرات والبث المباشر";
-    const description = guideIndex >= 0 ? `دليل شامل عن ${data.services[guideIndex]?.title || "خدمات الفعاليات"} في السعودية: التخطيط والتجهيز والتصوير والمخرجات والأسئلة الشائعة وطلب عرض سعر.` : isPortfolioPage ? "استعرض نماذج أعمال إيفنت لايف في تصوير الفعاليات والمؤتمرات والمعارض في السعودية." : isFaqPage ? "إجابات الأسئلة الشائعة حول خدمات إيفنت لايف لتصوير الفعاليات والبث المباشر في السعودية." : "إيفنت لايف المتخصصة في تغطية وتصوير الفعاليات والمؤتمرات والمعارض والإنتاج المرئي والبث المباشر في الرياض وكافة مناطق المملكة العربية السعودية.";
+    const title = isPhotographyPage ? "التصوير الفوتوغرافي للفعاليات في السعودية | EventLive KSA" : isVideographyPage ? "تصوير الفيديو للفعاليات في السعودية | EventLive KSA" : isContactPage ? "تواصل معنا وطلب عرض سعر | EventLive KSA" : guideIndex >= 0 ? `${data.services[guideIndex]?.title || "خدمات الفعاليات"} في السعودية | دليل إيفنت لايف` : isPortfolioPage ? "أعمالنا ومشاريع التصوير | EventLive KSA" : isFaqPage ? "الأسئلة الشائعة عن خدمات التصوير والبث | EventLive KSA" : "EventLive KSA - تغطية وتصوير الفعاليات والمؤتمرات والبث المباشر";
+    const description = isPhotographyPage ? "خدمات التصوير الفوتوغرافي للمعارض والمؤتمرات والفعاليات في السعودية؛ تعرف على التخطيط والمخرجات والأسئلة الشائعة." : isVideographyPage ? "تصوير فيديو الفعاليات والمونتاج والمقاطع القصيرة في السعودية؛ تفاصيل مراحل العمل والمخرجات والأسئلة الشائعة." : isContactPage ? "تواصل مع إيفنت لايف لطلب عرض سعر لتصوير الفعاليات والمعارض والمؤتمرات والبث المباشر." : guideIndex >= 0 ? `دليل شامل عن ${data.services[guideIndex]?.title || "خدمات الفعاليات"} في السعودية: التخطيط والتجهيز والتصوير والمخرجات والأسئلة الشائعة وطلب عرض سعر.` : isPortfolioPage ? "استعرض نماذج أعمال إيفنت لايف في تصوير الفعاليات والمؤتمرات والمعارض في السعودية." : isFaqPage ? "إجابات الأسئلة الشائعة حول خدمات إيفنت لايف لتصوير الفعاليات والبث المباشر في السعودية." : "إيفنت لايف المتخصصة في تغطية وتصوير الفعاليات والمؤتمرات والمعارض والإنتاج المرئي والبث المباشر في الرياض وكافة مناطق المملكة العربية السعودية.";
     document.title = title;
     document.querySelector('meta[name="description"]')?.setAttribute("content", description);
     document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonicalUrl);
@@ -2993,7 +2997,7 @@ export default function App() {
       </AnimatePresence>
 
       <main role="main" className="relative">
-        {isServicesPage ? <ServicesDirectoryPage services={data.services} /> : guideIndex >= 0 ? <ServiceGuidePage service={data.services[guideIndex]} guide={SERVICE_GUIDES[guideIndex]} allServices={data.services} /> : (isPortfolioPage || isFaqPage) ? (
+        {isPhotographyPage ? <MediaServicePage kind="photography" /> : isVideographyPage ? <MediaServicePage kind="videography" /> : isContactPage ? <ContactPage /> : isServicesPage ? <ServicesDirectoryPage services={data.services} /> : guideIndex >= 0 ? <ServiceGuidePage service={data.services[guideIndex]} guide={SERVICE_GUIDES[guideIndex]} allServices={data.services} /> : (isPortfolioPage || isFaqPage) ? (
           <div className="relative pt-28 md:pt-36 min-h-screen">
             <div className="max-w-7xl mx-auto px-6 pb-6" dir="rtl">
               <a href="/" className="text-amber-400 hover:underline text-sm">الرئيسية / {isPortfolioPage ? "أعمالنا" : "الأسئلة الشائعة"}</a>
