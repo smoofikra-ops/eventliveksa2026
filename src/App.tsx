@@ -877,6 +877,7 @@ const Services = ({ services }: { services: Service[] }) => {
                 <p className={`text-[8px] sm:text-xs md:text-[16px] leading-tight sm:leading-relaxed md:leading-[1.75] font-normal relative z-10 line-clamp-2 md:line-clamp-none ${s.cardBgImage ? 'text-white/90' : 'text-[#111]/80 dark:text-white/80'}`}>{t(`service.${s.id}.desc`) || s.desc}</p>
               </div>
               
+              <a href={`/services/${SERVICE_GUIDES[i]?.slug}`} onClick={(e) => e.stopPropagation()} className="relative z-20 mt-4 self-start inline-flex rounded-lg border border-amber-400/70 bg-black/65 px-3 py-2 text-sm font-bold text-amber-300 hover:bg-amber-500 hover:text-black">تفاصيل الخدمة ←</a>
               {/* Bottom Gradient Line */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
             </motion.div>
