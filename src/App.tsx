@@ -17,6 +17,7 @@ import {
   Truck, Plane, Train, Bike, Car, Anchor, Sun, Moon, CloudRain, Wind, Snowflake, Flame, Droplet, Languages, Volume2, VolumeX, Ghost, Menu, Flag
 } from "lucide-react";
 
+import SiteSearch from './components/SiteSearch';
 import { StorySection } from './components/cinematic/StorySection';
 import { cinematicScenes } from './data/cinematicScenes';
 import { CinematicBackground } from './components/cinematic/CinematicBackground';
@@ -484,7 +485,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
     { label: t('nav.services'), href: '/services', icon: <Layout className="w-5 h-5" /> },
     { label: t('nav.portfolio'), href: '/portfolio', icon: <Play className="w-5 h-5" /> },
     { label: t('nav.faq'), href: '/faq', icon: <MessageCircle className="w-5 h-5" /> },
-    { label: t('nav.contact'), href: '#contact', icon: <Phone className="w-5 h-5" /> }
+    { label: t('nav.contact'), href: '/#contact', icon: <Phone className="w-5 h-5" /> }
   ];
 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -527,6 +528,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
         </div>
         
         <div className="flex items-center gap-3">
+          <SiteSearch />
           <button 
             onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
             className="px-4 py-2 rounded-full bg-bdark:/5 hover:bg-black/10 dark:hover:/10 transition-colors font-bold text-sm"
@@ -555,7 +557,7 @@ const Sidebar = ({ onAdminClick, isAdminMode, onQuoteClick }: { onAdminClick: ()
             <img src={getOptimizedImageUrl("https://nmolabs-cdn.b-cdn.net/eventlive/brand/logos/eventlive-logo-03.png")} alt="EventLive" className="h-8 object-contain drop-shadow-[0_0_15px_rgba(255,138,0,0.3)]"  loading="lazy" />
           </a>
         </div>
-        <div className="flex-1 flex justify-center"></div>
+        <div className="flex-1 flex justify-center"><SiteSearch /></div>
         <div className="flex-1 flex justify-end">
           <button 
             onClick={() => setIsOpen(!isOpen)}
