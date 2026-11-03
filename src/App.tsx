@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import SiteSearch from './components/SiteSearch';
+import { VisualServicesDirectory } from './components/VisualServicesDirectory';
 import { MediaServicePage, ContactPage } from './components/EditorialServicePages';
 import { StorySection } from './components/cinematic/StorySection';
 import { cinematicScenes } from './data/cinematicScenes';
@@ -2976,7 +2977,7 @@ export default function App() {
       <AnnouncementBanner />
       <ScrollProgress />
       <MouseFollower />
-      <Sidebar onAdminClick={() => setIsAdminOpen(!isAdminOpen)} isAdminMode={isAdminOpen} onQuoteClick={() => setIsQuoteOpen(true)} />
+      {!isServicesPage && <Sidebar onAdminClick={() => setIsAdminOpen(!isAdminOpen)} isAdminMode={isAdminOpen} onQuoteClick={() => setIsQuoteOpen(true)} />}
       
       <AnimatePresence>
         {isQuoteOpen && <QuoteModal isOpen={isQuoteOpen} onClose={() => setIsQuoteOpen(false)} />}
@@ -2997,7 +2998,7 @@ export default function App() {
       </AnimatePresence>
 
       <main role="main" className="relative">
-        {isPhotographyPage ? <MediaServicePage kind="photography" /> : isVideographyPage ? <MediaServicePage kind="videography" /> : isContactPage ? <ContactPage /> : isServicesPage ? <ServicesDirectoryPage services={data.services} /> : guideIndex >= 0 ? <ServiceGuidePage service={data.services[guideIndex]} guide={SERVICE_GUIDES[guideIndex]} allServices={data.services} /> : (isPortfolioPage || isFaqPage) ? (
+        {isPhotographyPage ? <MediaServicePage kind="photography" /> : isVideographyPage ? <MediaServicePage kind="videography" /> : isContactPage ? <ContactPage /> : isServicesPage ? <VisualServicesDirectory services={data.services} /> : guideIndex >= 0 ? <ServiceGuidePage service={data.services[guideIndex]} guide={SERVICE_GUIDES[guideIndex]} allServices={data.services} /> : (isPortfolioPage || isFaqPage) ? (
           <div className="relative pt-28 md:pt-36 min-h-screen">
             <div className="max-w-7xl mx-auto px-6 pb-6" dir="rtl">
               <a href="/" className="text-amber-400 hover:underline text-sm">الرئيسية / {isPortfolioPage ? "أعمالنا" : "الأسئلة الشائعة"}</a>
@@ -3032,7 +3033,7 @@ export default function App() {
           </>
         )}
       </main>
-      <Footer socialLinks={data.socialLinks} />
+      {!isServicesPage && <Footer socialLinks={data.socialLinks} />}
       <FloatingActionButtons />
     </div>
     </ActiveSceneProvider>
