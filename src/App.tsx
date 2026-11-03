@@ -2910,6 +2910,7 @@ function ServiceGuidePage({ service, guide, allServices }: { service: Service; g
           <div className="rounded-2xl border-r-4 border-amber-500 bg-amber-400/10 p-6 md:p-8 mb-10"><h2 className="text-2xl font-bold mb-3">دليل عملي لتغطية الفعاليات باحترافية</h2><p className="text-white/80 leading-9">من تحديد أهداف التصوير والمشاهد ذات الأولوية إلى تجهيز الفريق وإدارة المواد وتسليم النسخ النهائية، يوضح هذا الدليل الاعتبارات التي تساعدك على اختيار تغطية مناسبة لفعاليتك. تفاصيل التنفيذ النهائية تُحدد بعد معرفة الموقع والجدول والمتطلبات.</p></div>
           {sections.map((section,i)=><section id={`guide-${i+1}`} key={section} className={`mb-9 scroll-mt-28 rounded-2xl border p-6 md:p-8 ${i%2===0?'border-white/10 bg-[#171719]':'border-amber-400/15 bg-[#101012]'}`}>
             <div className="flex gap-4 items-start mb-5"><span className="shrink-0 text-3xl font-black text-amber-400/65">{String(i+1).padStart(2,'0')}</span><h2 className="text-xl md:text-2xl font-bold text-amber-300 leading-relaxed">{section}</h2></div>
+            {(i === 0 || i % 3 === 0) && <div className="relative mb-6 overflow-hidden rounded-xl aspect-[16/8] bg-[#24242a]"><img src={getOptimizedImageUrl(service.cardBgImage)} alt={`تغطية ${service.title} — ${section}`} loading="lazy" className="h-full w-full object-cover"/><div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" /></div>}
             {isExhibition ? <div className="space-y-6">{[0,1].map(n=><div key={n} className="border-t border-white/10 pt-5"><h3 className="text-lg md:text-xl font-semibold mb-3">{EXHIBITION_GUIDE.details[i*2+n][0]}</h3><p className="text-white/75 leading-9">{EXHIBITION_GUIDE.details[i*2+n][1]}</p></div>)}</div> : <div className="space-y-5"><h3 className="text-lg font-semibold">التخطيط والإعداد</h3><p className="text-white/75 leading-9">{guideDetail[guide.slug]} تبدأ هذه المرحلة بتحديد المسؤوليات والمخرجات ونقاط التنسيق مع المنظم، مع مراجعة متطلبات {section} بحسب طبيعة المشروع وموقعه ومدته.</p><h3 className="text-lg font-semibold">اعتبارات التنفيذ والتسليم</h3><p className="text-white/75 leading-9">تُوثق متطلبات {section} في قائمة عمل واضحة، وتُراجع الجودة والملفات والتصاريح ذات الصلة قبل اعتماد المخرجات. يختلف حجم الفريق والتجهيزات والمدة بحسب نطاق الخدمة المتفق عليه.</p></div>}
           </section>)}
           {isExhibition && <section className="mb-10 rounded-2xl border border-amber-400/20 bg-[#171719] p-5 md:p-8 overflow-x-auto"><h2 className="text-2xl font-bold text-amber-300 mb-5">مقارنة مخرجات تصوير المعارض</h2><table className="w-full min-w-[500px] text-right border-collapse"><thead><tr className="bg-amber-400/15">{['المخرج','الاستخدام','ما يُحدد قبل التنفيذ'].map(h=><th key={h} className="p-4 border border-white/20">{h}</th>)}</tr></thead><tbody>{[['الصور الفوتوغرافية','التقارير والتغطية الإعلامية','العدد والأسلوب وموعد التسليم'],['الفيديو الملخص','الموقع والعروض التقديمية','المدة واللغة والمقاس'],['المقاطع القصيرة','منصات التواصل الاجتماعي','النسبة والعدد والترجمة'],['المقابلات','العلاقات العامة والتسويق','الضيوف والأسئلة والموافقات']].map(row=><tr key={row[0]}>{row.map(v=><td key={v} className="p-4 border border-white/20 text-white/80">{v}</td>)}</tr>)}</tbody></table></section>}
@@ -2977,7 +2978,7 @@ export default function App() {
       <AnnouncementBanner />
       <ScrollProgress />
       <MouseFollower />
-      {!isServicesPage && <Sidebar onAdminClick={() => setIsAdminOpen(!isAdminOpen)} isAdminMode={isAdminOpen} onQuoteClick={() => setIsQuoteOpen(true)} />}
+      <Sidebar onAdminClick={() => setIsAdminOpen(!isAdminOpen)} isAdminMode={isAdminOpen} onQuoteClick={() => setIsQuoteOpen(true)} />
       
       <AnimatePresence>
         {isQuoteOpen && <QuoteModal isOpen={isQuoteOpen} onClose={() => setIsQuoteOpen(false)} />}
@@ -3033,7 +3034,7 @@ export default function App() {
           </>
         )}
       </main>
-      {!isServicesPage && <Footer socialLinks={data.socialLinks} />}
+      <Footer socialLinks={data.socialLinks} />
       <FloatingActionButtons />
     </div>
     </ActiveSceneProvider>
